@@ -1,177 +1,37 @@
 [
-    {
-        "id": "wkt-001",
-        "name": "Push Day",
-        "category": "push",
-        "estimatedMinutes": 45,
-        "exercises": [
-            {
-                "exerciseId": "ex-001",
-                "sets": 4,
-                "reps": 6
-            },
-            {
-                "exerciseId": "ex-002",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-003",
-                "sets": 3,
-                "reps": 10
-            },
-            {
-                "exerciseId": "ex-004",
-                "sets": 3,
-                "reps": 12
-            },
-            {
-                "exerciseId": "ex-005",
-                "sets": 2,
-                "reps": 15
-            }
-        ]
-    },
-    {
-        "id": "wkt-002",
-        "name": "Pull Day",
-        "category": "pull",
-        "estimatedMinutes": 45,
-        "exercises": [
-            {
-                "exerciseId": "ex-006",
-                "sets": 4,
-                "reps": 6
-            },
-            {
-                "exerciseId": "ex-007",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-008",
-                "sets": 3,
-                "reps": 10
-            },
-            {
-                "exerciseId": "ex-009",
-                "sets": 3,
-                "reps": 10
-            },
-            {
-                "exerciseId": "ex-010",
-                "sets": 3,
-                "reps": 12
-            }
-        ]
-    },
-    {
-        "id": "wkt-003",
-        "name": "Leg Day",
-        "category": "legs",
-        "estimatedMinutes": 50,
-        "exercises": [
-            {
-                "exerciseId": "ex-011",
-                "sets": 4,
-                "reps": 5
-            },
-            {
-                "exerciseId": "ex-012",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-013",
-                "sets": 3,
-                "reps": 10
-            },
-            {
-                "exerciseId": "ex-014",
-                "sets": 3,
-                "reps": 12
-            },
-            {
-                "exerciseId": "ex-015",
-                "sets": 4,
-                "reps": 15
-            }
-        ]
-    },
-    {
-        "id": "wkt-004",
-        "name": "Upper Body",
-        "category": "upper",
-        "estimatedMinutes": 55,
-        "exercises": [
-            {
-                "exerciseId": "ex-001",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-006",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-002",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-007",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-010",
-                "sets": 3,
-                "reps": 12
-            },
-            {
-                "exerciseId": "ex-004",
-                "sets": 3,
-                "reps": 12
-            }
-        ]
-    },
-    {
-        "id": "wkt-005",
-        "name": "Full Body",
-        "category": "full_body",
-        "estimatedMinutes": 60,
-        "exercises": [
-            {
-                "exerciseId": "ex-011",
-                "sets": 3,
-                "reps": 6
-            },
-            {
-                "exerciseId": "ex-001",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-006",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-012",
-                "sets": 3,
-                "reps": 8
-            },
-            {
-                "exerciseId": "ex-016",
-                "sets": 3,
-                "reps": 1
-            },
-            {
-                "exerciseId": "ex-019",
-                "sets": 3,
-                "reps": 10
-            }
-        ]
-    }
+  {
+    "id": "wkt-001",
+    "name": "Lower Body & Push",
+    "category": "Tuesday",
+    "estimatedMinutes": 45,
+    "exercises": [
+      { "exerciseId": "ex-001", "sets": 4, "reps": 8 },
+      { "exerciseId": "ex-002", "sets": 3, "reps": 0 },
+      { "exerciseId": "ex-003", "sets": 3, "reps": 12 },
+      { "exerciseId": "ex-004", "sets": 3, "reps": 8 }
+    ]
+  },
+  {
+    "id": "wkt-002",
+    "name": "Posterior Chain & Core",
+    "category": "Wednesday",
+    "estimatedMinutes": 40,
+    "exercises": [
+      { "exerciseId": "ex-005", "sets": 3, "reps": 5 },
+      { "exerciseId": "ex-006", "sets": 3, "reps": 12 },
+      { "exerciseId": "ex-007", "sets": 3, "reps": 0 },
+      { "exerciseId": "ex-008", "sets": 3, "reps": 0 }
+    ]
+  },
+  {
+    "id": "wkt-003",
+    "name": "Full Body Intensity & Skill",
+    "category": "Friday",
+    "estimatedMinutes": 45,
+    "exercises": [
+      { "exerciseId": "ex-009", "sets": 4, "reps": 4 },
+      { "exerciseId": "ex-010", "sets": 4, "reps": 3 },
+      { "exerciseId": "ex-011", "sets": 3, "reps": 20 }
+    ]
+  }
 ]

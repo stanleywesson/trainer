@@ -1,182 +1,158 @@
 [
-    {
-        "id": "ex-001",
-        "name": "Bench Press",
-        "muscleGroup": "push",
-        "defaultSets": 3,
-        "defaultReps": 8,
-        "restSeconds": 90,
-        "description": "Barbell press lying flat on a bench."
-    },
-    {
-        "id": "ex-002",
-        "name": "Overhead Press",
-        "muscleGroup": "push",
-        "defaultSets": 3,
-        "defaultReps": 8,
-        "restSeconds": 90,
-        "description": "Press barbell from shoulders overhead."
-    },
-    {
-        "id": "ex-003",
-        "name": "Incline Dumbbell Press",
-        "muscleGroup": "push",
-        "defaultSets": 3,
-        "defaultReps": 10,
-        "restSeconds": 75,
-        "description": "Dumbbell press on an incline bench."
-    },
-    {
-        "id": "ex-004",
-        "name": "Tricep Dips",
-        "muscleGroup": "push",
-        "defaultSets": 3,
-        "defaultReps": 12,
-        "restSeconds": 60,
-        "description": "Bodyweight dips targeting the triceps."
-    },
-    {
-        "id": "ex-005",
-        "name": "Push-Ups",
-        "muscleGroup": "push",
-        "defaultSets": 3,
-        "defaultReps": 15,
-        "restSeconds": 60,
-        "description": "Classic floor push-up."
-    },
-    {
-        "id": "ex-006",
-        "name": "Barbell Row",
-        "muscleGroup": "pull",
-        "defaultSets": 3,
-        "defaultReps": 8,
-        "restSeconds": 90,
-        "description": "Bent-over row with a barbell."
-    },
-    {
-        "id": "ex-007",
-        "name": "Pull-Ups",
-        "muscleGroup": "pull",
-        "defaultSets": 3,
-        "defaultReps": 8,
-        "restSeconds": 90,
-        "description": "Overhand grip pull-up to chin over bar."
-    },
-    {
-        "id": "ex-008",
-        "name": "Lat Pulldown",
-        "muscleGroup": "pull",
-        "defaultSets": 3,
-        "defaultReps": 10,
-        "restSeconds": 75,
-        "description": "Cable pulldown targeting the lats."
-    },
-    {
-        "id": "ex-009",
-        "name": "Seated Cable Row",
-        "muscleGroup": "pull",
-        "defaultSets": 3,
-        "defaultReps": 10,
-        "restSeconds": 75,
-        "description": "Two-hand cable row in seated position."
-    },
-    {
-        "id": "ex-010",
-        "name": "Dumbbell Curl",
-        "muscleGroup": "pull",
-        "defaultSets": 3,
-        "defaultReps": 12,
-        "restSeconds": 60,
-        "description": "Alternating dumbbell bicep curl."
-    },
-    {
-        "id": "ex-011",
-        "name": "Squat",
-        "muscleGroup": "legs",
-        "defaultSets": 4,
-        "defaultReps": 6,
-        "restSeconds": 120,
-        "description": "Barbell back squat to parallel."
-    },
-    {
-        "id": "ex-012",
-        "name": "Romanian Deadlift",
-        "muscleGroup": "legs",
-        "defaultSets": 3,
-        "defaultReps": 8,
-        "restSeconds": 90,
-        "description": "Hip-hinge movement focusing on hamstrings."
-    },
-    {
-        "id": "ex-013",
-        "name": "Leg Press",
-        "muscleGroup": "legs",
-        "defaultSets": 3,
-        "defaultReps": 10,
-        "restSeconds": 90,
-        "description": "Quad-dominant machine press."
-    },
-    {
-        "id": "ex-014",
-        "name": "Walking Lunges",
-        "muscleGroup": "legs",
-        "defaultSets": 3,
-        "defaultReps": 12,
-        "restSeconds": 75,
-        "description": "Alternating forward lunges, 12 per leg."
-    },
-    {
-        "id": "ex-015",
-        "name": "Calf Raises",
-        "muscleGroup": "legs",
-        "defaultSets": 3,
-        "defaultReps": 15,
-        "restSeconds": 60,
-        "description": "Standing calf raise on a step or machine."
-    },
-    {
-        "id": "ex-016",
-        "name": "Plank",
-        "muscleGroup": "core",
-        "defaultSets": 3,
-        "defaultReps": 1,
-        "restSeconds": 60,
-        "description": "Hold a straight-body plank for 45–60 seconds."
-    },
-    {
-        "id": "ex-017",
-        "name": "Cable Crunch",
-        "muscleGroup": "core",
-        "defaultSets": 3,
-        "defaultReps": 15,
-        "restSeconds": 60,
-        "description": "Kneeling crunch against cable resistance."
-    },
-    {
-        "id": "ex-018",
-        "name": "Hanging Leg Raise",
-        "muscleGroup": "core",
-        "defaultSets": 3,
-        "defaultReps": 12,
-        "restSeconds": 60,
-        "description": "Raise legs to 90° while hanging from a bar."
-    },
-    {
-        "id": "ex-019",
-        "name": "Ab Wheel Rollout",
-        "muscleGroup": "core",
-        "defaultSets": 3,
-        "defaultReps": 10,
-        "restSeconds": 60,
-        "description": "Extend ab wheel from kneeling position."
-    },
-    {
-        "id": "ex-020",
-        "name": "Russian Twist",
-        "muscleGroup": "core",
-        "defaultSets": 3,
-        "defaultReps": 20,
-        "restSeconds": 45,
-        "description": "Seated trunk rotation, 20 total reps."
-    }
+  {
+    "id": "ex-001",
+    "name": "Bulgarian Split Squats",
+    "muscleGroup": "Quads, Glutes",
+    "secondaryMuscle": "Core, Adductors",
+    "defaultSets": 4,
+    "defaultReps": 8,
+    "repType": "reps",
+    "restSeconds": 90,
+    "tempo": "3-1-X-0",
+    "equipment": "Chair / Couch",
+    "description": "Keep torso upright. Front knee tracks over foot, not past toes. Drive through the heel.",
+    "progressionPath": "Add Pause → Add Weight → Jump Variation"
+  },
+  {
+    "id": "ex-002",
+    "name": "Tempo Pushups",
+    "muscleGroup": "Chest",
+    "secondaryMuscle": "Triceps, Shoulders, Core",
+    "defaultSets": 3,
+    "defaultReps": 0,
+    "repType": "failure",
+    "restSeconds": 75,
+    "tempo": "2-2-1-0",
+    "equipment": "Floor",
+    "description": "Elbows at 45 degrees, not flared out. Core tight, body in a straight line from head to heels.",
+    "progressionPath": "Decline → Archer → One-Arm Negative"
+  },
+  {
+    "id": "ex-003",
+    "name": "Doorway / Table Rows",
+    "muscleGroup": "Back (Lats, Rhomboids)",
+    "secondaryMuscle": "Biceps, Rear Delts",
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "repType": "reps",
+    "restSeconds": 60,
+    "tempo": "2-0-1-1",
+    "equipment": "Sturdy Doorframe / Table",
+    "description": "Squeeze shoulder blades together at the top. Keep hips from sagging.",
+    "progressionPath": "Lower Body Angle → Single Arm → Add Weight Vest"
+  },
+  {
+    "id": "ex-004",
+    "name": "Pike Pushups",
+    "muscleGroup": "Shoulders",
+    "secondaryMuscle": "Triceps, Upper Chest",
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "repType": "reps",
+    "restSeconds": 60,
+    "tempo": "2-1-1-0",
+    "equipment": "Floor",
+    "description": "Hips high in an inverted V. Lower the top of your head towards the floor, not your face.",
+    "progressionPath": "Elevate Feet → Wall Handstand Hold → Wall Handstand Pushup"
+  },
+  {
+    "id": "ex-005",
+    "name": "Nordic Hamstring Curls",
+    "muscleGroup": "Hamstrings",
+    "secondaryMuscle": "Glutes, Calves",
+    "defaultSets": 3,
+    "defaultReps": 5,
+    "repType": "reps",
+    "restSeconds": 120,
+    "tempo": "4-0-X-0",
+    "equipment": "Couch / Partner to hold ankles",
+    "description": "Lower your torso as slowly as possible. Keep a straight line from knees to head. Catch yourself with your hands.",
+    "progressionPath": "Increase Negative Time → Add Band Assistance → Full Nordic"
+  },
+  {
+    "id": "ex-006",
+    "name": "Single-Leg Glute Bridge",
+    "muscleGroup": "Glutes",
+    "secondaryMuscle": "Hamstrings, Core",
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "repType": "reps",
+    "restSeconds": 60,
+    "tempo": "1-2-1-0",
+    "equipment": "Floor",
+    "description": "Drive through the heel of the planted foot. Squeeze the glute hard for 2 seconds at the top. Keep hips level.",
+    "progressionPath": "Elevate Shoulders → Add Weight on Hips → Add Pause at Top"
+  },
+  {
+    "id": "ex-007",
+    "name": "Plank to Pushup",
+    "muscleGroup": "Core (Abs, Obliques)",
+    "secondaryMuscle": "Triceps, Shoulders",
+    "defaultSets": 3,
+    "defaultReps": 0,
+    "repType": "duration",
+    "defaultDuration": 45,
+    "restSeconds": 60,
+    "tempo": "Controlled",
+    "equipment": "Floor",
+    "description": "Minimize hip rocking as you move from plank to pushup position and back. Alternate leading arm.",
+    "progressionPath": "Increase Duration → Add Weight Vest"
+  },
+  {
+    "id": "ex-008",
+    "name": "Hollow Body Hold",
+    "muscleGroup": "Core (Abs)",
+    "secondaryMuscle": "Hip Flexors",
+    "defaultSets": 3,
+    "defaultReps": 0,
+    "repType": "duration",
+    "defaultDuration": 45,
+    "restSeconds": 60,
+    "tempo": "Static Hold",
+    "equipment": "Floor",
+    "description": "Press lower back firmly into the floor. The lower your legs and arms, the harder it is. No arch in the back.",
+    "progressionPath": "Tuck → One Leg Extended → Full Hollow → Add Rocking Motion"
+  },
+  {
+    "id": "ex-009",
+    "name": "Archer Pushups",
+    "muscleGroup": "Chest, Triceps",
+    "secondaryMuscle": "Shoulders, Obliques",
+    "defaultSets": 4,
+    "defaultReps": 4,
+    "repType": "reps",
+    "restSeconds": 90,
+    "tempo": "3-1-1-0",
+    "equipment": "Floor",
+    "description": "Wide hand position. As you lower, shift your weight to one side, keeping the other arm straight.",
+    "progressionPath": "Increase ROM → Elevate Feet → Transition to One-Arm Negative"
+  },
+  {
+    "id": "ex-010",
+    "name": "Pistol Squat Negatives",
+    "muscleGroup": "Quads, Glutes",
+    "secondaryMuscle": "Balance, Core, Hamstrings",
+    "defaultSets": 4,
+    "defaultReps": 3,
+    "repType": "reps",
+    "restSeconds": 90,
+    "tempo": "4-0-X-0",
+    "equipment": "Chair / Box",
+    "description": "Stand on one leg, slowly lower yourself to a seated position on a chair. Use both legs to stand up and repeat.",
+    "progressionPath": "Lower Chair Height → Assisted Pistol → Full Pistol Squat"
+  },
+  {
+    "id": "ex-011",
+    "name": "Single-Leg Calf Raises",
+    "muscleGroup": "Calves",
+    "secondaryMuscle": "Ankle Stability",
+    "defaultSets": 3,
+    "defaultReps": 20,
+    "repType": "reps",
+    "restSeconds": 45,
+    "tempo": "2-1-1-1",
+    "equipment": "Stairs / Step",
+    "description": "Stand on the edge of a step. Full range of motion — deep stretch at the bottom, hard squeeze at the top.",
+    "progressionPath": "Add Weight → Bent Knee Variation (Soleus focus)"
+  }
 ]
