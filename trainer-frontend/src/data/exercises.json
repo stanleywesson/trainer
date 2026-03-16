@@ -1,0 +1,182 @@
+[
+    {
+        "id": "ex-001",
+        "name": "Bench Press",
+        "muscleGroup": "push",
+        "defaultSets": 3,
+        "defaultReps": 8,
+        "restSeconds": 90,
+        "description": "Barbell press lying flat on a bench."
+    },
+    {
+        "id": "ex-002",
+        "name": "Overhead Press",
+        "muscleGroup": "push",
+        "defaultSets": 3,
+        "defaultReps": 8,
+        "restSeconds": 90,
+        "description": "Press barbell from shoulders overhead."
+    },
+    {
+        "id": "ex-003",
+        "name": "Incline Dumbbell Press",
+        "muscleGroup": "push",
+        "defaultSets": 3,
+        "defaultReps": 10,
+        "restSeconds": 75,
+        "description": "Dumbbell press on an incline bench."
+    },
+    {
+        "id": "ex-004",
+        "name": "Tricep Dips",
+        "muscleGroup": "push",
+        "defaultSets": 3,
+        "defaultReps": 12,
+        "restSeconds": 60,
+        "description": "Bodyweight dips targeting the triceps."
+    },
+    {
+        "id": "ex-005",
+        "name": "Push-Ups",
+        "muscleGroup": "push",
+        "defaultSets": 3,
+        "defaultReps": 15,
+        "restSeconds": 60,
+        "description": "Classic floor push-up."
+    },
+    {
+        "id": "ex-006",
+        "name": "Barbell Row",
+        "muscleGroup": "pull",
+        "defaultSets": 3,
+        "defaultReps": 8,
+        "restSeconds": 90,
+        "description": "Bent-over row with a barbell."
+    },
+    {
+        "id": "ex-007",
+        "name": "Pull-Ups",
+        "muscleGroup": "pull",
+        "defaultSets": 3,
+        "defaultReps": 8,
+        "restSeconds": 90,
+        "description": "Overhand grip pull-up to chin over bar."
+    },
+    {
+        "id": "ex-008",
+        "name": "Lat Pulldown",
+        "muscleGroup": "pull",
+        "defaultSets": 3,
+        "defaultReps": 10,
+        "restSeconds": 75,
+        "description": "Cable pulldown targeting the lats."
+    },
+    {
+        "id": "ex-009",
+        "name": "Seated Cable Row",
+        "muscleGroup": "pull",
+        "defaultSets": 3,
+        "defaultReps": 10,
+        "restSeconds": 75,
+        "description": "Two-hand cable row in seated position."
+    },
+    {
+        "id": "ex-010",
+        "name": "Dumbbell Curl",
+        "muscleGroup": "pull",
+        "defaultSets": 3,
+        "defaultReps": 12,
+        "restSeconds": 60,
+        "description": "Alternating dumbbell bicep curl."
+    },
+    {
+        "id": "ex-011",
+        "name": "Squat",
+        "muscleGroup": "legs",
+        "defaultSets": 4,
+        "defaultReps": 6,
+        "restSeconds": 120,
+        "description": "Barbell back squat to parallel."
+    },
+    {
+        "id": "ex-012",
+        "name": "Romanian Deadlift",
+        "muscleGroup": "legs",
+        "defaultSets": 3,
+        "defaultReps": 8,
+        "restSeconds": 90,
+        "description": "Hip-hinge movement focusing on hamstrings."
+    },
+    {
+        "id": "ex-013",
+        "name": "Leg Press",
+        "muscleGroup": "legs",
+        "defaultSets": 3,
+        "defaultReps": 10,
+        "restSeconds": 90,
+        "description": "Quad-dominant machine press."
+    },
+    {
+        "id": "ex-014",
+        "name": "Walking Lunges",
+        "muscleGroup": "legs",
+        "defaultSets": 3,
+        "defaultReps": 12,
+        "restSeconds": 75,
+        "description": "Alternating forward lunges, 12 per leg."
+    },
+    {
+        "id": "ex-015",
+        "name": "Calf Raises",
+        "muscleGroup": "legs",
+        "defaultSets": 3,
+        "defaultReps": 15,
+        "restSeconds": 60,
+        "description": "Standing calf raise on a step or machine."
+    },
+    {
+        "id": "ex-016",
+        "name": "Plank",
+        "muscleGroup": "core",
+        "defaultSets": 3,
+        "defaultReps": 1,
+        "restSeconds": 60,
+        "description": "Hold a straight-body plank for 45–60 seconds."
+    },
+    {
+        "id": "ex-017",
+        "name": "Cable Crunch",
+        "muscleGroup": "core",
+        "defaultSets": 3,
+        "defaultReps": 15,
+        "restSeconds": 60,
+        "description": "Kneeling crunch against cable resistance."
+    },
+    {
+        "id": "ex-018",
+        "name": "Hanging Leg Raise",
+        "muscleGroup": "core",
+        "defaultSets": 3,
+        "defaultReps": 12,
+        "restSeconds": 60,
+        "description": "Raise legs to 90° while hanging from a bar."
+    },
+    {
+        "id": "ex-019",
+        "name": "Ab Wheel Rollout",
+        "muscleGroup": "core",
+        "defaultSets": 3,
+        "defaultReps": 10,
+        "restSeconds": 60,
+        "description": "Extend ab wheel from kneeling position."
+    },
+    {
+        "id": "ex-020",
+        "name": "Russian Twist",
+        "muscleGroup": "core",
+        "defaultSets": 3,
+        "defaultReps": 20,
+        "restSeconds": 45,
+        "description": "Seated trunk rotation, 20 total reps."
+    }
+]
