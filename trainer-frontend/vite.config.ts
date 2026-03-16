@@ -23,7 +23,8 @@ export default defineConfig({
         background_color: '#1e1e2e',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        scope: '/trainer/',
+        start_url: '/trainer/',
         icons: [
           { src: '/trainer/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/trainer/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
