@@ -4,10 +4,13 @@ import exercisesData from '@/data/exercises.json'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import SetTracker from '@/components/SetTracker.vue';
+import RestTimer from '@/components/RestTimer.vue';
 
 const route = useRoute();
 const router = useRouter();
 const currentIndex = ref(0);
+const showRest = ref(false);
+const restSeconds = ref(0);
 
 const workout = computed(() =>
     workoutsData.find(x => x.id === route.params.id)
@@ -41,6 +44,15 @@ function next() {
         currentIndex.value++;
     }
 }
+
+function onSetComplete() {
+    restSeconds.value = currentExercise.value?.restSeconds ?? 60;
+    showRest.value = true;
+}
+
+function onRestDone() {
+    showRest.value = false;
+}
 </script>
 
 <template>
@@ -72,7 +84,8 @@ function next() {
             <p class="text-gray-400 text-sm">{{ currentExercise.description }}</p>
 
             <SetTracker :key="currentIndex" :sets="currentExercise.sets" :reps="currentExercise.reps"
-                :repType="currentExercise.repType" :default-duration="currentExercise.defaultDuration" class="mt-1" />
+                :repType="currentExercise.repType" :default-duration="currentExercise.defaultDuration" class="mt-1"
+                @set-complete="onSetComplete" />
 
             <div class="text-sm text-gray-300">
                 <span>Tempo: {{ currentExercise.tempo }}</span>
@@ -87,6 +100,9 @@ function next() {
             </div>
         </div>
 
+        <!-- Rest Timer -->
+        <RestTimer v-if="showRest" :key="restSeconds" :seconds="restSeconds" @done="onRestDone" @skip="onRestDone" />
+
         <!-- Next Exercise Preview -->
         <div class="bg-gray-800/50 rounded-2xl p-4 flex flex-col gap-1" v-if="nextExercise">
             <span class="text-xs text-gray-500 uppercase tracking-widest">Up next</span>
@@ -94,7 +110,7 @@ function next() {
         </div>
 
         <!-- Navigation -->
-        <div class="mt-auto">
+        <div class="mt-auto" v-if="!showRest">
             <button @click="next"
                 class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg active:scale-95 transition-transform">{{
                     isLastExercise ? 'Finish' : 'Next Exercise' }}</button>
