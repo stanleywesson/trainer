@@ -3,6 +3,7 @@ import workoutsData from '@/data/workouts.json'
 import exercisesData from '@/data/exercises.json'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
+import SetTracker from '@/components/SetTracker.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -26,13 +27,6 @@ const isLastExercise = computed(() => currentIndex.value >= exercises.value.leng
 
 function finishEarly() {
     router.push('/');
-}
-
-function repLabel(exercise: typeof currentExercise.value) {
-    if (!exercise) return ''
-    if (exercise.repType === 'failure') return 'To Failure'
-    if (exercise.repType === 'duration') return `${exercise.defaultDuration}s`
-    return `${exercise.reps} reps`
 }
 
 function next() {
@@ -72,9 +66,10 @@ function next() {
             <h2 class="text-2xl font-bold text-white">{{ currentExercise.name }}</h2>
             <p class="text-gray-400 text-sm">{{ currentExercise.description }}</p>
 
-            <div class="flex gap-4 mt-1 text-sm text-gray-300">
-                <span>{{ currentExercise.sets }} sets</span>
-                <span>{{ repLabel(currentExercise) }}</span>
+            <SetTracker :key="currentIndex" :sets="currentExercise.sets" :reps="currentExercise.reps"
+                :repType="currentExercise.repType" :default-duration="currentExercise.defaultDuration" class="mt-1" />
+
+            <div class="text-sm text-gray-300">
                 <span>Tempo: {{ currentExercise.tempo }}</span>
             </div>
 
