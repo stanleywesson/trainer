@@ -14,11 +14,16 @@ const workout = computed(() =>
 );
 
 const exercises = computed(() =>
-    (workout.value?.exercises ?? []).map(e => ({
-        ...exercisesData.find(ex => ex.id === e.exerciseId)!,
-        sets: e.sets,
-        reps: e.reps
-    }))
+    (workout.value?.exercises ?? []).map(e => {
+        const ex = exercisesData.find(data => data.id === e.exerciseId)!
+
+        return {
+            ...ex,
+            sets: e.sets,
+            reps: e.reps,
+            repType: ex.repType as 'reps' | 'duration' | 'failure'
+        }
+    })
 );
 
 const currentExercise = computed(() => exercises.value[currentIndex.value]);
