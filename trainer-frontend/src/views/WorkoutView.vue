@@ -101,7 +101,9 @@ function onRestDone() {
         </div>
 
         <!-- Rest Timer -->
-        <RestTimer v-if="showRest" :key="restSeconds" :seconds="restSeconds" @done="onRestDone" @skip="onRestDone" />
+        <div v-if="showRest" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center p-8 z-10">
+            <RestTimer :key="restSeconds" :seconds="restSeconds" @done="onRestDone" @skip="onRestDone" />
+        </div>
 
         <!-- Next Exercise Preview -->
         <div class="bg-gray-800/50 rounded-2xl p-4 flex flex-col gap-1" v-if="nextExercise">
@@ -110,7 +112,7 @@ function onRestDone() {
         </div>
 
         <!-- Navigation -->
-        <div class="mt-auto" v-if="!showRest">
+        <div class="mt-auto">
             <button @click="next"
                 class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg active:scale-95 transition-transform">{{
                     isLastExercise ? 'Finish' : 'Next Exercise' }}</button>
