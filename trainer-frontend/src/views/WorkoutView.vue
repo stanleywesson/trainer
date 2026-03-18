@@ -11,6 +11,8 @@ const router = useRouter();
 const currentIndex = ref(0);
 const showRest = ref(false);
 const restSeconds = ref(0);
+const startTime = ref(Date.now());
+const completedCount = ref(0);
 
 const workout = computed(() =>
     workoutsData.find(x => x.id === route.params.id)
@@ -37,9 +39,21 @@ function finishEarly() {
     router.push('/');
 }
 
-function next() {
+function next(skipped = false) {
+    if (!skipped)
+        completedCount.value++
+
     if (isLastExercise.value) {
-        router.push('/');
+        router.push(
+            {
+                name: 'summary',
+                params: { id: route.params.id },
+                query: {
+                    startTime: startTime.value,
+                    completed: completedCount.value
+                }
+            }
+        );
     } else {
         currentIndex.value++;
     }
@@ -113,11 +127,11 @@ function onRestDone() {
 
         <!-- Navigation -->
         <div class="mt-auto">
-            <button @click="next"
+            <button @click="next(false)"
                 class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg active:scale-95 transition-transform">{{
                     isLastExercise ? 'Finish' : 'Next Exercise' }}</button>
-            <button v-if="!isLastExercise" @click="next" class="w-full py-3 mt-2 text-gray-400 text-sm">Skip this
-                exercise</button>
+            <button @click="next(true)" class="w-full py-3 mt-2 text-gray-400 text-sm">{{
+                isLastExercise ? 'Skip & Finish' : 'Skip this exercise' }}</button>
         </div>
     </div>
 </template>
