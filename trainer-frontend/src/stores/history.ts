@@ -40,12 +40,17 @@ export const useHistoryStore = defineStore("history", () => {
         return [...workouts.value].reverse();
     }
 
+    function getById(id: string): WorkoutSession | undefined {
+        return workouts.value.find(w => w.id === id);
+    }
+
     load();
 
     return {
         workouts,
         saveWorkout,
-        getHistory
+        getHistory,
+        getById
     }
 });
 
