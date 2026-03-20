@@ -3,9 +3,11 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import workoutsData from '@/data/workouts.json'
 import DifficultyRating from '@/components/DifficultyRating.vue'
+import { useHistoryStore } from '@/stores/history';
 
 const route = useRoute();
 const router = useRouter();
+const historyStore = useHistoryStore();
 
 const workout = computed(() => workoutsData.find(w => w.id === route.params.id));
 const startTime = Number(route.query.startTime);
@@ -22,23 +24,13 @@ function formatDuration(ms: number) {
 }
 
 function saveAndFinish() {
-    let history = []
-    try {
-        history = JSON.parse(localStorage.getItem('trainer_history') ?? '[]')
-    } catch {
-        history = []
-    }
-
-    history.push({
-        workoutId: route.params.id,
-        workoutName: workout.value?.name,
-        date: new Date().toISOString(),
-        durationMs,
-        exercisesCompleted: completed,
-        difficulty: difficulty.value
-    });
-
-    localStorage.setItem('trainer_history', JSON.stringify(history));
+    historyStore.saveWorkout({
+        workoutId: route.params.id as string,
+        workoutName: workout.value?.name ?? '',
+        durationSeconds: Math.floor(durationMs / 1000),
+        difficulty: difficulty.value,
+        completedExercises: completed,
+    })
     router.push('/');
 }
 </script>
