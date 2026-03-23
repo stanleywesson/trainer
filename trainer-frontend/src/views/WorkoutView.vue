@@ -36,7 +36,7 @@ const nextExercise = computed(() => exercises.value[currentIndex.value + 1] ?? n
 const isLastExercise = computed(() => currentIndex.value >= exercises.value.length - 1);
 
 function finishEarly() {
-    router.push('/');
+    router.push({ name: 'workoutDetail', params: { id: route.params.id } });
 }
 
 function next(skipped = false) {
