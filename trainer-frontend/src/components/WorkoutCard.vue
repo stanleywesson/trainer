@@ -1,13 +1,19 @@
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue';
+
+const props = defineProps<{
   workout: {
     id: string
     name: string
     category: string
+    difficulty: number
     estimatedMinutes: number
     exercises: unknown[]
   }
-}>()
+}>();
+
+const difficultyLabels = ['', 'Easy', 'Moderate', 'Hard', 'Very Hard', 'Max Effort'];
+const difficultyLabel = computed(() => difficultyLabels[props.workout.difficulty] ?? '');
 </script>
 
 <template>
@@ -20,6 +26,11 @@ defineProps<{
       <span class="text-xs text-gray-400">{{ workout.estimatedMinutes }} min</span>
     </div>
     <h2 class="text-lg font-bold text-white">{{ workout.name }}</h2>
-    <p class="text-sm text-gray-400">{{ workout.exercises.length }} exercises</p>
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-gray-400">{{ workout.exercises.length }} exercises</p>
+      <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-700 text-indigo-300">
+        {{ workout.difficulty }} · {{ difficultyLabel }}
+      </span>
+    </div>
   </div>
 </template>
