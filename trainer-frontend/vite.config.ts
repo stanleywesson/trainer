@@ -28,7 +28,7 @@ export default defineConfig({
         icons: [
           { src: '/trainer/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/trainer/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: '/trainer/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          { src: '/trainer/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ]
       },
       workbox: {
