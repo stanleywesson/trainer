@@ -2,9 +2,11 @@
 import { computed, ref } from 'vue'
 import WorkoutCard from '@/components/WorkoutCard.vue'
 import workoutsData from '@/data/workouts.json'
+import { useHistoryStore } from '@/stores/history';
 
 const selectedDuration = ref<number | null>(null);
 const selectedDifficulty = ref<number | null>(null);
+const historyStore = useHistoryStore();
 
 const durations = [15, 20, 30, 40, 60];
 const difficulties = [
@@ -28,13 +30,18 @@ function toggleDuration(d: number) {
 function toggleDifficulty(d: number) {
     selectedDifficulty.value = selectedDifficulty.value === d ? null : d
 }
+
 </script>
 
 <template>
     <div class="min-h-screen bg-gray-900 p-4">
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-bold text-white">Workouts</h1>
-            <RouterLink to="/history" class="text-sm text-indigo-400 font-semibold">History</RouterLink>
+            <div class="flex items-center gap-4">
+                <span v-if="historyStore.workoutStreak > 0" class="text-sm text-orange-400 font-semibold">🔥 {{
+                    historyStore.workoutStreak }}</span>
+                <RouterLink to="/history" class="text-sm text-indigo-400 font-semibold">History</RouterLink>
+            </div>
         </div>
 
         <!-- Duration filter -->
