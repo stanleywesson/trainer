@@ -25,11 +25,11 @@ function openDetail(workout: WorkoutSession) {
 </script>
 
 <template>
-    <div class="p-4 bg-gray-900 min-h-screen">
-        <div class="flex items-center gap-3 mb-6">
-            <RouterLink to="/" class="text-gray-400 text-2xl leading-none">‹</RouterLink>
-            <h1 class="text-2xl font-bold text-white">History</h1>
+    <div class="p-4 bg-gray-900 min-h-screen flex flex-col gap-6">
+        <div class="flex items-center justify-between pt-2">
+            <RouterLink to="/" class="text-sm text-gray-400 font-semibold">← Back</RouterLink>
         </div>
+        <h1 class="text-3xl font-bold text-white">History</h1>
 
         <div v-if="history.length === 0" class="text-center text-gray-500 pt-20">
             No workouts yet.
