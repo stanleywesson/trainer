@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 export interface WorkoutSession {
     id: string
@@ -44,13 +44,30 @@ export const useHistoryStore = defineStore("history", () => {
         return workouts.value.find(w => w.id === id);
     }
 
+    function localDateKey(d: Date) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    }
+
+    const workoutStreak = computed(() => {
+        const days = new Set(workouts.value.map(w => localDateKey(new Date(w.date))))
+        let count = 0
+        const today = new Date()
+        while (true) {
+            if (!days.has(localDateKey(today))) break
+            count++
+            today.setDate(today.getDate() - 1)
+        }
+        return count
+    });
+
     load();
 
     return {
         workouts,
         saveWorkout,
         getHistory,
-        getById
+        getById,
+        workoutStreak
     }
 });
 
