@@ -1,279 +1,417 @@
 [
   {
-    "id": "wkt-001",
-    "name": "Lower Body & Push",
-    "category": "Lower Body & Push",
-    "difficulty": 3,
-    "estimatedMinutes": 45,
-    "recommendation": "Ideal when legs are fresh. Pair with a pull-focused session the following day for a balanced upper/lower split.",
-    "exercises": [
-      { "exerciseId": "ex-001", "sets": 4, "reps": 8 },
-      { "exerciseId": "ex-002", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-003", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-004", "sets": 3, "reps": 8 }
-    ]
-  },
-  {
-    "id": "wkt-002",
-    "name": "Posterior Chain & Core",
-    "category": "Posterior Chain",
-    "difficulty": 3,
-    "estimatedMinutes": 40,
-    "recommendation": "Best done 48 hours after a heavy lower body session. Excellent for injury prevention and posture.",
-    "exercises": [
-      { "exerciseId": "ex-005", "sets": 3, "reps": 5 },
-      { "exerciseId": "ex-006", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-007", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-008", "sets": 3, "reps": 0 }
-    ]
-  },
-  {
-    "id": "wkt-003",
-    "name": "Full Body Intensity & Skill",
+    "id": "w1",
+    "name": "Foundations Full Body",
     "category": "Full Body",
-    "difficulty": 4,
-    "estimatedMinutes": 45,
-    "recommendation": "Reserve this for days when you are fully rested. The skill movements demand peak focus and coordination.",
-    "exercises": [
-      { "exerciseId": "ex-009", "sets": 4, "reps": 4 },
-      { "exerciseId": "ex-010", "sets": 4, "reps": 3 },
-      { "exerciseId": "ex-011", "sets": 3, "reps": 20 }
-    ]
-  },
-  {
-    "id": "wkt-004",
-    "name": "Morning Core Ignition",
-    "category": "Core",
     "difficulty": 1,
-    "estimatedMinutes": 15,
-    "recommendation": "Perfect as a morning wake-up before breakfast. Low impact, gets blood flowing without taxing your recovery.",
-    "exercises": [
-      { "exerciseId": "ex-030", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-026", "sets": 3, "reps": 8 },
-      { "exerciseId": "ex-027", "sets": 2, "reps": 20 },
-      { "exerciseId": "ex-031", "sets": 2, "reps": 0 }
-    ]
-  },
-  {
-    "id": "wkt-005",
-    "name": "Quick Upper Body Hit",
-    "category": "Push",
-    "difficulty": 2,
-    "estimatedMinutes": 15,
-    "recommendation": "Great on days when you only have 15 minutes. Best done mid-morning when you are warmed up but not fatigued.",
-    "exercises": [
-      { "exerciseId": "ex-021", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-020", "sets": 2, "reps": 10 },
-      { "exerciseId": "ex-018", "sets": 2, "reps": 8 }
-    ]
-  },
-  {
-    "id": "wkt-006",
-    "name": "Lower Body Blitz",
-    "category": "Lower Body",
-    "difficulty": 3,
-    "estimatedMinutes": 15,
-    "recommendation": "Short but potent. Gets the heart rate up and legs burning in 15 minutes. Good before a longer run or walk.",
-    "exercises": [
-      { "exerciseId": "ex-012", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-013", "sets": 2, "reps": 0 },
-      { "exerciseId": "ex-006", "sets": 2, "reps": 12 }
-    ]
-  },
-  {
-    "id": "wkt-007",
-    "name": "Push Strength",
-    "category": "Push",
-    "difficulty": 3,
     "estimatedMinutes": 20,
-    "recommendation": "Focus on a slow, controlled tempo throughout. Best done when arms are fully fresh — not after any shoulder or chest work.",
+    "recommendation": "Start here. Do it 3× a week on non-consecutive days. When PU1 and PL1 feel easy at 12+, move to W2–W4.",
+    "format": "sets",
     "exercises": [
-      { "exerciseId": "ex-002", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-019", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-018", "sets": 3, "reps": 8 },
-      { "exerciseId": "ex-004", "sets": 2, "reps": 8 }
+      {
+        "exerciseId": "pu1",
+        "sets": 3,
+        "reps": 12
+      },
+      {
+        "exerciseId": "pl1",
+        "sets": 3,
+        "reps": 10
+      },
+      {
+        "exerciseId": "lg1",
+        "sets": 3,
+        "reps": 15
+      },
+      {
+        "exerciseId": "lg8",
+        "sets": 2,
+        "reps": 12
+      },
+      {
+        "exerciseId": "co1",
+        "sets": 3,
+        "reps": 0,
+        "duration": 30
+      }
     ]
   },
   {
-    "id": "wkt-008",
-    "name": "Pull & Posture",
+    "id": "w2",
+    "name": "Push Day",
+    "category": "Push",
+    "difficulty": 3,
+    "estimatedMinutes": 30,
+    "recommendation": "Chest, shoulders and triceps. Pair with W3 the next day.",
+    "format": "sets",
+    "exercises": [
+      {
+        "exerciseId": "pu3",
+        "sets": 4,
+        "reps": 12
+      },
+      {
+        "exerciseId": "vp1",
+        "sets": 3,
+        "reps": 8
+      },
+      {
+        "exerciseId": "pu5",
+        "sets": 3,
+        "reps": 10
+      },
+      {
+        "exerciseId": "vp5",
+        "sets": 3,
+        "reps": 12
+      },
+      {
+        "exerciseId": "pu4",
+        "sets": 2,
+        "reps": 8
+      }
+    ]
+  },
+  {
+    "id": "w3",
+    "name": "Pull & Posture (home)",
     "category": "Pull",
     "difficulty": 2,
     "estimatedMinutes": 20,
-    "recommendation": "Critical for posture balance. Do this after any push-heavy week to keep your shoulders healthy long term.",
+    "recommendation": "No bar needed. Counterbalances all the pushing and helps desk posture.",
+    "format": "sets",
     "exercises": [
-      { "exerciseId": "ex-024", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-003", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-025", "sets": 3, "reps": 12 }
+      {
+        "exerciseId": "pl1",
+        "sets": 4,
+        "reps": 10
+      },
+      {
+        "exerciseId": "pl2",
+        "sets": 3,
+        "reps": 12
+      },
+      {
+        "exerciseId": "co8",
+        "sets": 3,
+        "reps": 0,
+        "duration": 30
+      },
+      {
+        "exerciseId": "co4",
+        "sets": 2,
+        "reps": 0,
+        "duration": 40
+      }
     ]
   },
   {
-    "id": "wkt-009",
-    "name": "Lower Body Strength",
+    "id": "w3b",
+    "name": "Pull Day (bar)",
+    "category": "Pull",
+    "difficulty": 3,
+    "estimatedMinutes": 30,
+    "recommendation": "Bar version of W3. Builds toward your first strict pull-ups.",
+    "format": "sets",
+    "exercises": [
+      {
+        "exerciseId": "pl5",
+        "sets": 3,
+        "reps": 10
+      },
+      {
+        "exerciseId": "pl6",
+        "sets": 3,
+        "reps": 5
+      },
+      {
+        "exerciseId": "pl3",
+        "sets": 3,
+        "reps": 10
+      },
+      {
+        "exerciseId": "pl8",
+        "sets": 3,
+        "reps": 6
+      },
+      {
+        "exerciseId": "pl4",
+        "sets": 2,
+        "reps": 0,
+        "duration": 30
+      }
+    ]
+  },
+  {
+    "id": "w4",
+    "name": "Leg Day",
     "category": "Lower Body",
     "difficulty": 3,
-    "estimatedMinutes": 20,
-    "recommendation": "No jumping — pure strength and control. Good for any training day. Allow 48 hours before your next leg session.",
+    "estimatedMinutes": 30,
+    "recommendation": "Single-leg focus is how you overload legs without weights. Rest well before a W2.",
+    "format": "sets",
     "exercises": [
-      { "exerciseId": "ex-014", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-015", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-006", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-017", "sets": 2, "reps": 12 }
+      {
+        "exerciseId": "lg3",
+        "sets": 3,
+        "reps": 8
+      },
+      {
+        "exerciseId": "lg2",
+        "sets": 3,
+        "reps": 10
+      },
+      {
+        "exerciseId": "lg4",
+        "sets": 3,
+        "reps": 5
+      },
+      {
+        "exerciseId": "lg7",
+        "sets": 3,
+        "reps": 5
+      },
+      {
+        "exerciseId": "lg10",
+        "sets": 3,
+        "reps": 15
+      }
     ]
   },
   {
-    "id": "wkt-010",
-    "name": "Core Power",
+    "id": "w5",
+    "name": "Plank Burner (Heria-style)",
     "category": "Core",
-    "difficulty": 3,
-    "estimatedMinutes": 20,
-    "recommendation": "Challenges your midsection from every angle. Do this 2–3 times per week for noticeable results within a month.",
-    "exercises": [
-      { "exerciseId": "ex-008", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-028", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-032", "sets": 3, "reps": 20 },
-      { "exerciseId": "ex-031", "sets": 2, "reps": 0 }
-    ]
-  },
-  {
-    "id": "wkt-011",
-    "name": "Full Body Starter",
-    "category": "Full Body",
     "difficulty": 2,
+    "estimatedMinutes": 15,
+    "recommendation": "Based on Heria's daily plank routine: 40s work / 20s rest, straight through, 2 rounds. Good as a short standalone or a finisher.",
+    "format": "circuit",
+    "circuit": {
+      "rounds": 2,
+      "workSeconds": 40,
+      "restSeconds": 20,
+      "roundRestSeconds": 60
+    },
+    "exercises": [
+      {
+        "exerciseId": "co2"
+      },
+      {
+        "exerciseId": "co3"
+      },
+      {
+        "exerciseId": "co4"
+      },
+      {
+        "exerciseId": "co5"
+      },
+      {
+        "exerciseId": "co6"
+      },
+      {
+        "exerciseId": "co1"
+      }
+    ]
+  },
+  {
+    "id": "w6",
+    "name": "Arms Without Weights (Heria-style)",
+    "category": "Arms",
+    "difficulty": 3,
     "estimatedMinutes": 20,
-    "recommendation": "A balanced intro to full body training. Perfect for beginners or as an active recovery session on a lighter day.",
+    "recommendation": "Based on Heria's no-weights arm session: 40s work / 20s rest, 3 rounds. Biceps via pseudo planche and rows, triceps via skull crushers and dips.",
+    "format": "circuit",
+    "circuit": {
+      "rounds": 3,
+      "workSeconds": 40,
+      "restSeconds": 20,
+      "roundRestSeconds": 60
+    },
     "exercises": [
-      { "exerciseId": "ex-037", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-021", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-024", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-026", "sets": 2, "reps": 8 }
+      {
+        "exerciseId": "pu7"
+      },
+      {
+        "exerciseId": "pl1"
+      },
+      {
+        "exerciseId": "vp7"
+      },
+      {
+        "exerciseId": "vp5"
+      },
+      {
+        "exerciseId": "vp1"
+      }
     ]
   },
   {
-    "id": "wkt-012",
-    "name": "Push & Pull Balance",
-    "category": "Upper Body",
-    "difficulty": 3,
-    "estimatedMinutes": 30,
-    "recommendation": "Balanced upper body session. Best paired with a lower body day 48 hours before or after for a complete weekly split.",
-    "exercises": [
-      { "exerciseId": "ex-002", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-003", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-004", "sets": 3, "reps": 8 },
-      { "exerciseId": "ex-025", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-018", "sets": 2, "reps": 8 }
-    ]
-  },
-  {
-    "id": "wkt-013",
-    "name": "Lower Body Grind",
-    "category": "Lower Body",
-    "difficulty": 3,
-    "estimatedMinutes": 30,
-    "recommendation": "Comprehensive lower body volume. Allow 72 hours of recovery before your next leg session — you will need it.",
-    "exercises": [
-      { "exerciseId": "ex-001", "sets": 3, "reps": 8 },
-      { "exerciseId": "ex-014", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-015", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-016", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-011", "sets": 2, "reps": 20 }
-    ]
-  },
-  {
-    "id": "wkt-014",
-    "name": "Core & Conditioning",
+    "id": "w7",
+    "name": "Core Compression",
     "category": "Core",
+    "difficulty": 3,
+    "estimatedMinutes": 20,
+    "recommendation": "Builds the hollow and compression strength behind L-sits and handstands.",
+    "format": "sets",
+    "exercises": [
+      {
+        "exerciseId": "co7",
+        "sets": 3,
+        "reps": 0,
+        "duration": 30
+      },
+      {
+        "exerciseId": "co10",
+        "sets": 3,
+        "reps": 15
+      },
+      {
+        "exerciseId": "co11",
+        "sets": 3,
+        "reps": 12
+      },
+      {
+        "exerciseId": "co13",
+        "sets": 3,
+        "reps": 0,
+        "duration": 15
+      },
+      {
+        "exerciseId": "co16",
+        "sets": 3,
+        "reps": 0,
+        "duration": 30
+      }
+    ]
+  },
+  {
+    "id": "w8",
+    "name": "Upper Strength",
+    "category": "Upper Body",
+    "difficulty": 4,
+    "estimatedMinutes": 40,
+    "recommendation": "Classic Calisthenicmovement-style push/pull pairing. Needs a bar and dip station (or 2 sturdy chairs for dips).",
+    "format": "sets",
+    "exercises": [
+      {
+        "exerciseId": "pl7",
+        "sets": 4,
+        "reps": 6
+      },
+      {
+        "exerciseId": "vp6",
+        "sets": 4,
+        "reps": 8
+      },
+      {
+        "exerciseId": "pl8",
+        "sets": 3,
+        "reps": 6
+      },
+      {
+        "exerciseId": "pu6",
+        "sets": 3,
+        "reps": 6
+      },
+      {
+        "exerciseId": "co19",
+        "sets": 3,
+        "reps": 12
+      },
+      {
+        "exerciseId": "pl4",
+        "sets": 1,
+        "reps": 0,
+        "duration": 60
+      }
+    ]
+  },
+  {
+    "id": "w9",
+    "name": "Conditioning",
+    "category": "Conditioning",
     "difficulty": 4,
     "estimatedMinutes": 30,
-    "recommendation": "Advanced core session. Prioritise form over rep count — reduce duration on holds before you start compensating.",
+    "recommendation": "Heart rate up: 40s work / 20s rest, 4 rounds. Use it on a day you don't feel like strength work.",
+    "format": "circuit",
+    "circuit": {
+      "rounds": 4,
+      "workSeconds": 40,
+      "restSeconds": 20,
+      "roundRestSeconds": 60
+    },
     "exercises": [
-      { "exerciseId": "ex-029", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-008", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-028", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-031", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-033", "sets": 3, "reps": 8 }
+      {
+        "exerciseId": "sk3"
+      },
+      {
+        "exerciseId": "lg9"
+      },
+      {
+        "exerciseId": "co18"
+      },
+      {
+        "exerciseId": "pu9"
+      },
+      {
+        "exerciseId": "sk4"
+      }
     ]
   },
   {
-    "id": "wkt-015",
-    "name": "Upper Body Power",
-    "category": "Upper Body",
-    "difficulty": 4,
-    "estimatedMinutes": 40,
-    "recommendation": "High intensity upper body. Only attempt this when fully rested and properly warmed up. Not suitable back-to-back days.",
-    "exercises": [
-      { "exerciseId": "ex-009", "sets": 4, "reps": 4 },
-      { "exerciseId": "ex-023", "sets": 4, "reps": 5 },
-      { "exerciseId": "ex-022", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-024", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-020", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-018", "sets": 3, "reps": 8 }
-    ]
-  },
-  {
-    "id": "wkt-016",
-    "name": "Full Body Power",
-    "category": "Full Body",
-    "difficulty": 4,
-    "estimatedMinutes": 40,
-    "recommendation": "Demanding and well-rounded. Best done as your main session for the day — nothing else taxing after this.",
-    "exercises": [
-      { "exerciseId": "ex-034", "sets": 3, "reps": 8 },
-      { "exerciseId": "ex-010", "sets": 4, "reps": 3 },
-      { "exerciseId": "ex-009", "sets": 3, "reps": 4 },
-      { "exerciseId": "ex-024", "sets": 3, "reps": 10 },
-      { "exerciseId": "ex-031", "sets": 3, "reps": 0 }
-    ]
-  },
-  {
-    "id": "wkt-017",
-    "name": "Full Body Elite",
-    "category": "Full Body",
+    "id": "w10",
+    "name": "Skill Day",
+    "category": "Skill",
     "difficulty": 5,
     "estimatedMinutes": 60,
-    "recommendation": "The most demanding session in the program. Come in fully rested, well-fed, and mentally locked in. Not for back-to-back days.",
+    "recommendation": "Handstand, planche, front lever and L-sit work. Do skills first while fresh. Advanced only.",
+    "format": "sets",
     "exercises": [
-      { "exerciseId": "ex-036", "sets": 3, "reps": 4 },
-      { "exerciseId": "ex-009", "sets": 4, "reps": 4 },
-      { "exerciseId": "ex-010", "sets": 4, "reps": 3 },
-      { "exerciseId": "ex-005", "sets": 3, "reps": 5 },
-      { "exerciseId": "ex-008", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-029", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-023", "sets": 3, "reps": 5 }
-    ]
-  },
-  {
-    "id": "wkt-018",
-    "name": "Lower Body & Core Endurance",
-    "category": "Lower Body",
-    "difficulty": 4,
-    "estimatedMinutes": 60,
-    "recommendation": "Targets posterior chain and core endurance together. Great as a Saturday session with a full rest day to follow.",
-    "exercises": [
-      { "exerciseId": "ex-005", "sets": 3, "reps": 5 },
-      { "exerciseId": "ex-001", "sets": 4, "reps": 8 },
-      { "exerciseId": "ex-017", "sets": 3, "reps": 12 },
-      { "exerciseId": "ex-013", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-008", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-026", "sets": 3, "reps": 8 },
-      { "exerciseId": "ex-030", "sets": 3, "reps": 0 }
-    ]
-  },
-  {
-    "id": "wkt-019",
-    "name": "Upper Body Skill Day",
-    "category": "Upper Body",
-    "difficulty": 5,
-    "estimatedMinutes": 60,
-    "recommendation": "Skill-based upper body work. These movements require fresh muscles and a sharp mind — never attempt this fatigued.",
-    "exercises": [
-      { "exerciseId": "ex-022", "sets": 4, "reps": 0 },
-      { "exerciseId": "ex-009", "sets": 4, "reps": 4 },
-      { "exerciseId": "ex-023", "sets": 4, "reps": 5 },
-      { "exerciseId": "ex-018", "sets": 4, "reps": 8 },
-      { "exerciseId": "ex-029", "sets": 3, "reps": 0 },
-      { "exerciseId": "ex-024", "sets": 4, "reps": 10 },
-      { "exerciseId": "ex-025", "sets": 3, "reps": 12 }
+      {
+        "exerciseId": "vp3",
+        "sets": 4,
+        "reps": 0,
+        "duration": 30
+      },
+      {
+        "exerciseId": "vp4",
+        "sets": 4,
+        "reps": 4
+      },
+      {
+        "exerciseId": "sk2",
+        "sets": 3,
+        "reps": 0,
+        "duration": 20
+      },
+      {
+        "exerciseId": "pu7",
+        "sets": 3,
+        "reps": 8
+      },
+      {
+        "exerciseId": "pl11",
+        "sets": 4,
+        "reps": 0,
+        "duration": 10
+      },
+      {
+        "exerciseId": "co14",
+        "sets": 4,
+        "reps": 0,
+        "duration": 10
+      },
+      {
+        "exerciseId": "co22",
+        "sets": 3,
+        "reps": 4
+      },
+      {
+        "exerciseId": "sk1",
+        "sets": 3,
+        "reps": 0,
+        "duration": 20
+      }
     ]
   }
 ]

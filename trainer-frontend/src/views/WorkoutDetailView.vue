@@ -1,25 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import workoutsData from '@/data/workouts.json'
-import exercisesData from '@/data/exercises.json'
+import { circuitLabel, getWorkout, planExercises, prescriptionLabel } from '@/data'
+import WatchLink from '@/components/WatchLink.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-const workout = computed(() => workoutsData.find(w => w.id === route.params.id))
-
-const exercises = computed(() =>
-    (workout.value?.exercises ?? []).map(e =>
-        exercisesData.find(ex => ex.id === e.exerciseId)!
-    )
-)
+const workout = computed(() => getWorkout(route.params.id))
+const exercises = computed(() => planExercises(workout.value))
+const circuit = computed(() => workout.value?.format === 'circuit' ? workout.value.circuit : undefined)
 
 const difficultyLabels = ['', 'Easy', 'Moderate', 'Hard', 'Very Hard', 'Max Effort']
 const difficultyLabel = computed(() => difficultyLabels[workout.value?.difficulty ?? 0] ?? '')
 
 function startWorkout() {
-    router.push({ name: 'workout', params: { id: route.params.id } })
+    router.push({ name: circuit.value ? 'circuit' : 'workout', params: { id: route.params.id } })
 }
 </script>
 
@@ -56,6 +52,14 @@ function startWorkout() {
             </div>
         </div>
 
+        <!-- Circuit format -->
+        <div v-if="circuit" class="bg-emerald-950/50 border border-emerald-800/40 rounded-2xl p-4 flex flex-col gap-1">
+            <span class="text-xs font-semibold uppercase tracking-widest text-emerald-400">Circuit</span>
+            <p class="text-sm text-gray-200 font-semibold">{{ circuitLabel(circuit) }}</p>
+            <p class="text-xs text-gray-400">Timed: move straight through every exercise, then repeat. {{
+                circuit.roundRestSeconds }}s break between rounds.</p>
+        </div>
+
         <!-- Recommendation -->
         <div class="bg-indigo-950/60 border border-indigo-800/40 rounded-2xl p-4 flex flex-col gap-1">
             <span class="text-xs font-semibold uppercase tracking-widest text-indigo-400">Recommendation</span>
@@ -68,10 +72,13 @@ function startWorkout() {
             <div v-for="(exercise, index) in exercises" :key="exercise.id"
                 class="flex items-center gap-3">
                 <span class="text-xs font-bold text-gray-600 w-5 text-right">{{ index + 1 }}</span>
-                <div class="flex flex-col">
+                <div class="flex flex-col flex-1 min-w-0">
                     <span class="text-white text-sm font-semibold">{{ exercise.name }}</span>
-                    <span class="text-gray-500 text-xs">{{ exercise.muscleGroup }}</span>
+                    <span class="text-gray-500 text-xs">{{ exercise.muscleGroup }} · {{ exercise.equipment }}</span>
                 </div>
+                <span class="text-xs font-semibold text-gray-300 shrink-0">{{
+                    circuit ? `${circuit.workSeconds}s` : prescriptionLabel(exercise) }}</span>
+                <WatchLink :exercise="exercise" compact />
             </div>
         </div>
 

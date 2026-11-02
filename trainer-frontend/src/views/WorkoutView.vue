@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import workoutsData from '@/data/workouts.json'
-import exercisesData from '@/data/exercises.json'
+import { getWorkout, planExercises } from '@/data'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import SetTracker from '@/components/SetTracker.vue';
 import RestTimer from '@/components/RestTimer.vue';
+import WatchLink from '@/components/WatchLink.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -14,22 +14,8 @@ const restSeconds = ref(0);
 const startTime = ref(Date.now());
 const completedCount = ref(0);
 
-const workout = computed(() =>
-    workoutsData.find(x => x.id === route.params.id)
-);
-
-const exercises = computed(() =>
-    (workout.value?.exercises ?? []).map(e => {
-        const ex = exercisesData.find(data => data.id === e.exerciseId)!
-
-        return {
-            ...ex,
-            sets: e.sets,
-            reps: e.reps,
-            repType: ex.repType as 'reps' | 'duration' | 'failure'
-        }
-    })
-);
+const workout = computed(() => getWorkout(route.params.id));
+const exercises = computed(() => planExercises(workout.value));
 
 const currentExercise = computed(() => exercises.value[currentIndex.value]);
 const nextExercise = computed(() => exercises.value[currentIndex.value + 1] ?? null);
@@ -100,9 +86,11 @@ function onRestDone() {
             </span>
             <h2 class="text-2xl font-bold text-white">{{ currentExercise.name }}</h2>
             <p class="text-gray-400 text-sm">{{ currentExercise.description }}</p>
+            <WatchLink :exercise="currentExercise" />
 
             <SetTracker :key="currentIndex" :sets="currentExercise.sets" :reps="currentExercise.reps"
-                :repType="currentExercise.repType" :default-duration="currentExercise.defaultDuration" class="mt-1"
+                :repType="currentExercise.repType" :duration="currentExercise.duration"
+                :per-side="currentExercise.perSide" class="mt-1"
                 @set-complete="onSetComplete" />
 
             <div class="text-sm text-gray-300">

@@ -8,6 +8,7 @@ const props = defineProps<{
     category: string
     difficulty: number
     estimatedMinutes: number
+    format?: 'sets' | 'circuit'
     exercises: unknown[]
   }
 }>();
@@ -20,8 +21,14 @@ const difficultyLabel = computed(() => difficultyLabels[props.workout.difficulty
   <div class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-2 active:scale-95 transition-transform cursor-pointer"
     @click="$router.push(`/workout/${workout.id}`)">
     <div class="flex items-center justify-between">
-      <span class="text-xs font-semibold uppercase tracking-widest text-indigo-400">
-        {{ workout.category.replace('_', ' ') }}
+      <span class="flex items-center gap-2">
+        <span class="text-xs font-semibold uppercase tracking-widest text-indigo-400">
+          {{ workout.category.replace('_', ' ') }}
+        </span>
+        <span v-if="workout.format === 'circuit'"
+          class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300">
+          Circuit
+        </span>
       </span>
       <span class="text-xs text-gray-400">{{ workout.estimatedMinutes }} min</span>
     </div>

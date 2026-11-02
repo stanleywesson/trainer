@@ -4,7 +4,8 @@ import { ref } from 'vue';
 const props = defineProps<{
     sets: number,
     repType: 'reps' | 'duration' | 'failure',
-    defaultDuration?: number,
+    duration?: number,
+    perSide?: boolean,
     reps: number
 }>();
 
@@ -16,9 +17,10 @@ const emit = defineEmits<{
 const completedSets = ref(0);
 
 function repLabel() {
-    if (props.repType === 'failure') return 'To Failure'
-    if (props.repType === 'duration') return `${props.defaultDuration}s`
-    return `${props.reps} reps`
+    const side = props.perSide ? ' / side' : ''
+    if (props.repType === 'failure') return `To Failure${side}`
+    if (props.repType === 'duration') return `${props.duration}s${side}`
+    return `${props.reps} reps${side}`
 }
 
 function completeSet(index: number) {

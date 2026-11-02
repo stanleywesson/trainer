@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import WorkoutCard from '@/components/WorkoutCard.vue'
-import workoutsData from '@/data/workouts.json'
+import { workouts as workoutsData } from '@/data'
 import { useHistoryStore } from '@/stores/history';
 
 const selectedDuration = ref<number | null>(null);

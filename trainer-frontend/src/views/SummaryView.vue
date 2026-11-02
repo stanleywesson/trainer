@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import workoutsData from '@/data/workouts.json'
+import { getWorkout } from '@/data'
 import DifficultyRating from '@/components/DifficultyRating.vue'
 import { useHistoryStore } from '@/stores/history';
 
@@ -9,7 +9,7 @@ const route = useRoute();
 const router = useRouter();
 const historyStore = useHistoryStore();
 
-const workout = computed(() => workoutsData.find(w => w.id === route.params.id));
+const workout = computed(() => getWorkout(route.params.id));
 const startTime = Number(route.query.startTime);
 const completed = Number(route.query.completed);
 const durationMs = startTime > 0 ? Date.now() - startTime : 0;
