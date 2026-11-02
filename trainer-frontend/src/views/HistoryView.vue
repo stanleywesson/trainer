@@ -25,10 +25,12 @@ function openDetail(workout: WorkoutSession) {
 </script>
 
 <template>
-    <div class="p-4 bg-gray-900 min-h-screen flex flex-col gap-6">
-        <div class="flex items-center justify-between pt-2">
-            <RouterLink to="/" class="text-sm text-gray-400 font-semibold">← Back</RouterLink>
-        </div>
+    <div class="flex-1 flex flex-col">
+        <header class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 flex items-center">
+            <RouterLink to="/" class="header-btn">← Back</RouterLink>
+        </header>
+
+        <main class="flex-1 px-safe pt-3 pb-safe flex flex-col gap-6">
         <h1 class="text-3xl font-bold text-white">History</h1>
 
         <div v-if="history.length === 0" class="text-center text-gray-500 pt-20">
@@ -50,5 +52,6 @@ function openDetail(workout: WorkoutSession) {
                 </div>
             </button>
         </div>
+        </main>
     </div>
 </template>

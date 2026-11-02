@@ -36,7 +36,8 @@ function saveAndFinish() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-900 p-4 flex flex-col gap-6">
+    <div class="flex-1 flex flex-col">
+        <main class="flex-1 px-safe pt-safe pb-4 flex flex-col gap-6">
         <div class="flex flex-col items-center gap-2 pt-8">
             <span class="text-5xl">🏁</span>
             <h1 class="text-2xl font-bold text-white">Workout Complete</h1>
@@ -59,15 +60,17 @@ function saveAndFinish() {
             <DifficultyRating v-model="difficulty" />
         </div>
 
-        <div class="mt-auto">
+        </main>
+
+        <footer class="sticky bottom-0 z-20 bg-gray-900/95 backdrop-blur border-t border-gray-800 px-safe pt-3 pb-safe">
             <button @click="saveAndFinish" :disabled="difficulty === 0" :class="[
                 'w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-95',
                 difficulty > 0
                     ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-800 text-gray-600'
+                    : 'bg-gray-800 text-gray-400 border border-gray-700'
             ]">
                 Save & Finish
             </button>
-        </div>
+        </footer>
     </div>
 </template>

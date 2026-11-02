@@ -7,7 +7,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-950 text-white" style="padding-top: env(safe-area-inset-top)">
+  <div class="min-h-dvh flex flex-col bg-gray-900 text-white">
     <RouterView />
   </div>
 </template>

@@ -7,6 +7,7 @@ import { useHistoryStore } from '@/stores/history';
 const selectedDuration = ref<number | null>(null);
 const selectedDifficulty = ref<number | null>(null);
 const historyStore = useHistoryStore();
+const appVersion = __APP_VERSION__;
 
 const durations = [15, 20, 30, 40, 60];
 const difficulties = [
@@ -34,15 +35,18 @@ function toggleDifficulty(d: number) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-900 p-4">
-        <div class="flex items-center justify-between mb-6">
+    <div class="flex-1 flex flex-col">
+        <header
+            class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 flex items-center justify-between">
             <h1 class="text-2xl font-bold text-white">Workouts</h1>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
                 <span v-if="historyStore.workoutStreak > 0" class="text-sm text-orange-400 font-semibold">🔥 {{
                     historyStore.workoutStreak }}</span>
-                <RouterLink to="/history" class="text-sm text-indigo-400 font-semibold">History</RouterLink>
+                <RouterLink to="/history" class="header-btn">History</RouterLink>
             </div>
-        </div>
+        </header>
+
+        <main class="flex-1 px-safe pb-safe pt-3">
 
         <!-- Duration filter -->
         <div class="flex gap-2 mb-3 overflow-x-auto pb-1">
@@ -67,5 +71,8 @@ function toggleDifficulty(d: number) {
         <div class="flex flex-col gap-4">
             <WorkoutCard v-for="workout in filteredWorkouts" :key="workout.id" :workout="workout" />
         </div>
+
+        <p class="text-center text-xs text-gray-600 mt-8">v{{ appVersion }}</p>
+        </main>
     </div>
 </template>

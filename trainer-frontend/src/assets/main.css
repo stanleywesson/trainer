@@ -3,4 +3,40 @@
 html,
 body {
     overscroll-behavior: none;
+    background-color: var(--color-gray-900);
+}
+
+/* iPhone safe areas (notch / Dynamic Island on top, home indicator on bottom).
+   Each value falls back to normal spacing on devices without insets. */
+@utility pt-safe {
+    padding-top: calc(env(safe-area-inset-top) + 0.75rem);
+}
+
+@utility pb-safe {
+    padding-bottom: max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+}
+
+@utility px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+/* Pill-shaped header buttons: big tap target, clearly visible */
+@utility header-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background-color: var(--color-gray-800);
+    color: var(--color-gray-100);
+    border: 1px solid var(--color-gray-700);
+    transition: transform 150ms;
+
+    &:active {
+        transform: scale(0.95);
+    }
 }

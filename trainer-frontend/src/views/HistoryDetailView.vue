@@ -23,12 +23,14 @@ function formatDuration(seconds: number) {
 </script>
 
 <template>
-    <div class="p-4 bg-gray-900 min-h-screen">
+    <div class="flex-1 flex flex-col">
         <!-- Header -->
-        <div class="flex items-center gap-3 mb-6">
-            <button @click="router.back()" class="text-gray-400 text-2xl leading-none">‹</button>
-            <h1 class="text-2xl font-bold text-white">Workout Detail</h1>
-        </div>
+        <header class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 flex items-center gap-3">
+            <button @click="router.back()" class="header-btn">← Back</button>
+            <h1 class="text-xl font-bold text-white truncate">Workout Detail</h1>
+        </header>
+
+        <main class="flex-1 px-safe pt-3 pb-safe">
 
         <!-- Not found -->
         <div v-if="!workout" class="text-center text-gray-500 pt-20">
@@ -60,5 +62,6 @@ function formatDuration(seconds: number) {
                 </span>
             </div>
         </div>
+        </main>
     </div>
 </template>

@@ -5,16 +5,22 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import pkg from './package.json'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/trainer/',
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   plugins: [
     vue(),
     vueDevTools(),
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Registration is done manually in src/pwa.ts so we can force update checks
+      injectRegister: false,
       manifest: {
         name: 'Trainer',
         short_name: 'Trainer',
@@ -32,7 +38,12 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,json,png,svg,ico}']
+        globPatterns: ['**/*.{js,css,html,json,png,svg,ico}'],
+        // New service worker takes over immediately instead of waiting for all tabs to close
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        navigateFallback: 'index.html'
       }
     }),
   ],

@@ -24,11 +24,13 @@ function startWorkout() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-900 p-4 flex flex-col gap-6" v-if="workout">
+    <div class="flex-1 flex flex-col" v-if="workout">
         <!-- Header -->
-        <div class="flex items-center justify-between pt-2">
-            <button class="text-sm text-gray-400 font-semibold" @click="$router.push('/')">← Back</button>
-        </div>
+        <header class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 flex items-center">
+            <button class="header-btn" @click="$router.push('/')">← Back</button>
+        </header>
+
+        <main class="flex-1 px-safe pt-3 pb-4 flex flex-col gap-6">
 
         <!-- Title -->
         <div class="flex flex-col gap-1">
@@ -73,12 +75,14 @@ function startWorkout() {
             </div>
         </div>
 
+        </main>
+
         <!-- Start button -->
-        <div class="mt-auto">
+        <footer class="sticky bottom-0 z-20 bg-gray-900/95 backdrop-blur border-t border-gray-800 px-safe pt-3 pb-safe">
             <button @click="startWorkout"
                 class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg active:scale-95 transition-transform">
                 Start Workout
             </button>
-        </div>
+        </footer>
     </div>
 </template>

@@ -70,12 +70,16 @@ function onRestDone() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-900 p-4 flex flex-col gap-6">
+    <div class="flex-1 flex flex-col">
         <!-- Header -->
-        <div class="flex items-center justify-between">
-            <h1 class="text-xl font-bold text-white">{{ workout?.name }}</h1>
-            <button class="text-sm text-red-400 font-semibold" @click="finishEarly">Finish Early</button>
-        </div>
+        <header
+            class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 flex items-center justify-between gap-3">
+            <h1 class="text-xl font-bold text-white truncate">{{ workout?.name }}</h1>
+            <button class="header-btn shrink-0 !bg-red-500/15 !text-red-300 !border-red-500/40"
+                @click="finishEarly">Finish Early</button>
+        </header>
+
+        <main class="flex-1 px-safe pt-3 pb-4 flex flex-col gap-6">
 
         <!-- Progress -->
         <div class="flex flex-col gap-2">
@@ -115,7 +119,8 @@ function onRestDone() {
         </div>
 
         <!-- Rest Timer -->
-        <div v-if="showRest" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center p-8 z-10">
+        <div v-if="showRest"
+            class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center px-safe pt-safe pb-safe z-30">
             <RestTimer :key="restSeconds" :seconds="restSeconds" @done="onRestDone" @skip="onRestDone" />
         </div>
 
@@ -125,13 +130,16 @@ function onRestDone() {
             <span class="text-white font-semibold">{{ nextExercise?.name }}</span>
         </div>
 
+        </main>
+
         <!-- Navigation -->
-        <div class="mt-auto">
+        <footer class="sticky bottom-0 z-20 bg-gray-900/95 backdrop-blur border-t border-gray-800 px-safe pt-3 pb-safe">
             <button @click="next(false)"
                 class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg active:scale-95 transition-transform">{{
                     isLastExercise ? 'Finish' : 'Next Exercise' }}</button>
-            <button @click="next(true)" class="w-full py-3 mt-2 text-gray-400 text-sm">{{
+            <button @click="next(true)"
+                class="w-full py-3 mt-2 rounded-2xl border border-gray-700 text-gray-200 text-sm font-semibold active:scale-95 transition-transform">{{
                 isLastExercise ? 'Skip & Finish' : 'Skip this exercise' }}</button>
-        </div>
+        </footer>
     </div>
 </template>
