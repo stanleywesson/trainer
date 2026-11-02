@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { circuitLabel, getWorkout, planExercises, type PlannedExercise } from '@/data'
 import WatchLink from '@/components/WatchLink.vue'
+import { useIntervalTimer } from '@/composables/useIntervalTimer'
 
 type StepKind = 'ready' | 'work' | 'rest' | 'roundRest'
 interface Step {
@@ -47,21 +48,14 @@ const steps = computed<Step[]>(() => {
 
 const totalWorkSteps = computed(() => steps.value.filter(s => s.kind === 'work').length)
 
-const started = ref(false)
-const paused = ref(false)
-const stepIndex = ref(0)
-const remainingMs = ref(0)
 const completedIntervals = ref(0)
-const startTime = ref(0)
 
-let endAt = 0
-let ticker: ReturnType<typeof setInterval> | undefined
-let lastBeepSecond = -1
-
-const step = computed(() => steps.value[stepIndex.value])
-const remainingSeconds = computed(() => Math.max(0, Math.ceil(remainingMs.value / 1000)))
-const stepProgress = computed(() => step.value ? 1 - remainingMs.value / (step.value.seconds * 1000) : 0)
-const overallProgress = computed(() => steps.value.length ? stepIndex.value / steps.value.length : 0)
+const { started, paused, step, startTime, remainingSeconds, stepProgress, overallProgress, start, togglePause, skip, stop } =
+    useIntervalTimer(steps, {
+        isWork: s => s.kind === 'work',
+        onStepEnd: (s, skipped) => { if (s.kind === 'work' && !skipped) completedIntervals.value++ },
+        onFinish: finish,
+    })
 
 const phase = computed(() => {
     switch (step.value?.kind) {
@@ -72,109 +66,7 @@ const phase = computed(() => {
     }
 })
 
-// ---- sound (unlocked by the Start tap; iOS requires a user gesture) ----
-let audio: AudioContext | undefined
-function beep(freq = 880, ms = 120) {
-    if (!audio) return
-    const osc = audio.createOscillator()
-    const gain = audio.createGain()
-    osc.frequency.value = freq
-    gain.gain.setValueAtTime(0.25, audio.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + ms / 1000)
-    osc.connect(gain).connect(audio.destination)
-    osc.start()
-    osc.stop(audio.currentTime + ms / 1000)
-}
-
-// ---- keep the screen on while the timer runs ----
-let wakeLock: WakeLockSentinel | undefined
-async function requestWakeLock() {
-    try {
-        wakeLock = await navigator.wakeLock?.request('screen')
-    } catch {
-        // not supported / denied: timer still works
-    }
-}
-function onVisibility() {
-    if (document.visibilityState === 'visible' && started.value && !paused.value) {
-        requestWakeLock()
-        tick()
-    }
-}
-document.addEventListener('visibilitychange', onVisibility)
-
-// ---- timer ----
-function tick() {
-    const now = Date.now()
-    // catch up if the phone was locked / app was in the background
-    while (now >= endAt) {
-        if (!advance(false)) return
-    }
-    remainingMs.value = endAt - now
-
-    const s = remainingSeconds.value
-    if (s !== lastBeepSecond && s <= 3 && s >= 1) beep(660, 100)
-    lastBeepSecond = s
-}
-
-/** Move to the next step. Returns false when the session is finished. */
-function advance(skipped: boolean): boolean {
-    if (step.value?.kind === 'work' && !skipped) completedIntervals.value++
-
-    if (stepIndex.value >= steps.value.length - 1) {
-        finish()
-        return false
-    }
-    stepIndex.value++
-    const next = step.value!
-    endAt = skipped ? Date.now() + next.seconds * 1000 : endAt + next.seconds * 1000
-    remainingMs.value = endAt - Date.now()
-    lastBeepSecond = -1
-    beep(next.kind === 'work' ? 1046 : 523, next.kind === 'work' ? 300 : 200)
-    return true
-}
-
-function start() {
-    try {
-        audio = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-    } catch {
-        audio = undefined
-    }
-    started.value = true
-    startTime.value = Date.now()
-    stepIndex.value = 0
-    endAt = Date.now() + (step.value?.seconds ?? 0) * 1000
-    remainingMs.value = endAt - Date.now()
-    ticker = setInterval(tick, 200)
-    requestWakeLock()
-}
-
-function togglePause() {
-    if (paused.value) {
-        endAt = Date.now() + remainingMs.value
-        ticker = setInterval(tick, 200)
-        paused.value = false
-        requestWakeLock()
-    } else {
-        clearInterval(ticker)
-        remainingMs.value = Math.max(0, endAt - Date.now())
-        paused.value = true
-    }
-}
-
-function skip() {
-    if (paused.value) togglePause()
-    advance(true)
-}
-
-function stop() {
-    clearInterval(ticker)
-    wakeLock?.release().catch(() => { })
-    wakeLock = undefined
-}
-
 function finish() {
-    stop()
     router.push({
         name: 'summary',
         params: { id: route.params.id },
@@ -186,12 +78,6 @@ function finishEarly() {
     stop()
     router.push({ name: 'workoutDetail', params: { id: route.params.id } })
 }
-
-onUnmounted(() => {
-    stop()
-    document.removeEventListener('visibilitychange', onVisibility)
-    audio?.close().catch(() => { })
-})
 </script>
 
 <template>

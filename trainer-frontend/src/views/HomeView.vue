@@ -2,12 +2,13 @@
 import { computed, ref } from 'vue'
 import WorkoutCard from '@/components/WorkoutCard.vue'
 import { workouts as workoutsData, workoutLocation, type WorkoutLocation } from '@/data'
-import { useHistoryStore } from '@/stores/history';
+import { useCalendarStore } from '@/stores/calendar';
+import TodayCard from '@/components/TodayCard.vue'
 
 const selectedLocation = ref<WorkoutLocation | null>(null);
 const selectedDuration = ref<number | null>(null);
 const selectedDifficulty = ref<number | null>(null);
-const historyStore = useHistoryStore();
+const calendar = useCalendarStore();
 const appVersion = __APP_VERSION__;
 
 const locations: { value: WorkoutLocation, label: string }[] = [
@@ -50,13 +51,17 @@ function toggleDifficulty(d: number) {
             class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 flex items-center justify-between">
             <h1 class="text-2xl font-bold text-white">Workouts</h1>
             <div class="flex items-center gap-3">
-                <span v-if="historyStore.workoutStreak > 0" class="text-sm text-orange-400 font-semibold">🔥 {{
-                    historyStore.workoutStreak }}</span>
+                <span v-if="calendar.streak > 0" class="text-sm text-orange-400 font-semibold"
+                    :aria-label="`${calendar.streak} day streak`">🔥 {{ calendar.streak }}</span>
                 <RouterLink to="/history" class="header-btn">History</RouterLink>
             </div>
         </header>
 
         <main class="flex-1 px-safe pb-safe pt-3">
+
+        <TodayCard />
+
+        <h2 class="text-lg font-bold text-white mb-3">All workouts</h2>
 
         <!-- Location filter -->
         <div class="flex gap-2 mb-3">

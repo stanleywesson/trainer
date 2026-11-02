@@ -747,5 +747,195 @@
         "restSeconds": 40
       }
     ]
+  },
+  {
+    "id": "gym6",
+    "name": "Gym Starter A",
+    "category": "Full Body",
+    "difficulty": 1,
+    "estimatedMinutes": 30,
+    "recommendation": "Machine-based full body for getting back into the gym. Alternate with Starter B. Stop each set with 2–3 reps left in the tank.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-walk",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-leg-press",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-machine-chest-press",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-lat-pulldown",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-leg-curl",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "co1",
+        "sets": 3,
+        "reps": 0,
+        "duration": 30,
+        "restSeconds": 45
+      }
+    ]
+  },
+  {
+    "id": "gym7",
+    "name": "Gym Starter B",
+    "category": "Full Body",
+    "difficulty": 1,
+    "estimatedMinutes": 30,
+    "recommendation": "The other half of the starter pair: free-weight squat pattern, rows and pressing. Alternate with Starter A.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-walk",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-goblet-squat",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-cable-row",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-shoulder-press",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-hip-thrust",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-crunch",
+        "sets": 3,
+        "reps": 15,
+        "restSeconds": 45
+      }
+    ]
+  },
+  {
+    "id": "gym8",
+    "name": "Gym Upper",
+    "category": "Upper Body",
+    "difficulty": 2,
+    "estimatedMinutes": 40,
+    "recommendation": "Step up from the starters: push, pull and shoulders. Alternate with Gym Lower.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-db-bench",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-lat-pulldown",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-cable-row",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-lateral-raise",
+        "sets": 3,
+        "reps": 15,
+        "restSeconds": 45
+      },
+      {
+        "exerciseId": "g-face-pull",
+        "sets": 3,
+        "reps": 15,
+        "restSeconds": 45
+      }
+    ]
+  },
+  {
+    "id": "gym9",
+    "name": "Gym Lower",
+    "category": "Lower Body",
+    "difficulty": 2,
+    "estimatedMinutes": 40,
+    "recommendation": "Step up from the starters: quads, hamstrings, glutes and calves. Keep the RDL light and focus on the hip hinge.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-walk",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-leg-press",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-rdl",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-leg-extension",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-leg-curl",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-standing-calf",
+        "sets": 3,
+        "reps": 15,
+        "restSeconds": 45
+      }
+    ]
   }
 ]

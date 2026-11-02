@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
+import { useCalendarStore } from '@/stores/calendar'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +18,21 @@ const router = createRouter({
     path: '/workout/:id/session',
     name: 'workout',
     component: () => import('@/views/WorkoutView.vue'),
+  },
+  {
+    path: '/welcome',
+    name: 'welcome',
+    component: () => import('@/views/OnboardingView.vue'),
+  },
+  {
+    path: '/calendar',
+    name: 'calendar',
+    component: () => import('@/views/CalendarView.vue'),
+  },
+  {
+    path: '/run/:entryId',
+    name: 'run',
+    component: () => import('@/views/RunView.vue'),
   },
   {
     path: '/workout/:id/circuit',
@@ -38,6 +54,11 @@ const router = createRouter({
     name: 'historyDetail',
     component: () => import('@/views/HistoryDetailView.vue'),
   },],
+})
+
+// First launch (no plan chosen yet): send to plan setup
+router.beforeEach(to => {
+  if (to.name !== 'welcome' && useCalendarStore().needsSetup) return { name: 'welcome' }
 })
 
 export default router
