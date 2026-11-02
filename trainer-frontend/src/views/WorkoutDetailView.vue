@@ -14,6 +14,15 @@ const circuit = computed(() => workout.value?.format === 'circuit' ? workout.val
 const difficultyLabels = ['', 'Easy', 'Moderate', 'Hard', 'Very Hard', 'Max Effort']
 const difficultyLabel = computed(() => difficultyLabels[workout.value?.difficulty ?? 0] ?? '')
 
+/** "A1", "A2" … position within a superset group */
+function supersetTag(index: number) {
+    const list = exercises.value
+    const label = list[index]?.superset
+    let position = 1
+    for (let i = index - 1; i >= 0 && list[i]?.superset === label; i--) position++
+    return `${label}${position}`
+}
+
 function startWorkout() {
     router.push({ name: circuit.value ? 'circuit' : 'workout', params: { id: route.params.id } })
 }
@@ -71,15 +80,21 @@ function startWorkout() {
             <span class="text-xs font-semibold uppercase tracking-widest text-gray-500">Exercises</span>
             <div v-for="(exercise, index) in exercises" :key="exercise.id"
                 class="flex items-center gap-3">
-                <span class="text-xs font-bold text-gray-600 w-5 text-right">{{ index + 1 }}</span>
+                <span v-if="exercise.superset"
+                    class="text-[10px] font-bold w-7 text-center py-0.5 rounded-full bg-violet-500/20 text-violet-200 shrink-0">{{
+                        supersetTag(index) }}</span>
+                <span v-else class="text-xs font-bold text-gray-600 w-7 text-center shrink-0">{{ index + 1 }}</span>
                 <div class="flex flex-col flex-1 min-w-0">
                     <span class="text-white text-sm font-semibold">{{ exercise.name }}</span>
+                    <span class="text-indigo-300 text-xs font-semibold">{{
+                        circuit ? `${circuit.workSeconds}s` : prescriptionLabel(exercise) }}</span>
                     <span class="text-gray-500 text-xs">{{ exercise.muscleGroup }} · {{ exercise.equipment }}</span>
                 </div>
-                <span class="text-xs font-semibold text-gray-300 shrink-0">{{
-                    circuit ? `${circuit.workSeconds}s` : prescriptionLabel(exercise) }}</span>
                 <WatchLink :exercise="exercise" compact />
             </div>
+            <p v-if="exercises.some(e => e.superset)" class="text-xs text-gray-500">
+                Matching letters (A1 + A2) are supersets: alternate one set of each, then rest.
+            </p>
         </div>
 
         </main>

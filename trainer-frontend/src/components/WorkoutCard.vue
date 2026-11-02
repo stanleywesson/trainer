@@ -9,6 +9,7 @@ const props = defineProps<{
     difficulty: number
     estimatedMinutes: number
     format?: 'sets' | 'circuit'
+    location?: 'home' | 'gym'
     exercises: unknown[]
   }
 }>();
@@ -28,6 +29,10 @@ const difficultyLabel = computed(() => difficultyLabels[props.workout.difficulty
         <span v-if="workout.format === 'circuit'"
           class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300">
           Circuit
+        </span>
+        <span v-if="workout.location === 'gym'"
+          class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300">
+          Gym
         </span>
       </span>
       <span class="text-xs text-gray-400">{{ workout.estimatedMinutes }} min</span>

@@ -1,6 +1,22 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
+export interface LoggedSet {
+    kind: 'warmup' | 'working' | 'drop'
+    /** Target reps (0 for timed / max sets) */
+    reps: number
+    durationSeconds?: number
+    /** null = bodyweight / not entered */
+    weightKg: number | null
+}
+
+export interface ExerciseLog {
+    exerciseId: string
+    exerciseName: string
+    perSide?: boolean
+    sets: LoggedSet[]
+}
+
 export interface WorkoutSession {
     id: string
     date: string
@@ -9,12 +25,25 @@ export interface WorkoutSession {
     durationSeconds: number
     difficulty: number
     completedExercises: number
+    /** Sets done with weights; absent on sessions saved before weight logging existed */
+    log?: ExerciseLog[]
 }
 
 const STORAGE_KEY = 'trainer_history'
 
 export const useHistoryStore = defineStore("history", () => {
     const workouts = ref<WorkoutSession[]>([]);
+    /** Log of the session in progress, handed from the workout screen to the summary screen */
+    const pendingLog = ref<ExerciseLog[]>([]);
+
+    /** Most recent logged sets for an exercise, used to pre-fill weights */
+    function lastLog(exerciseId: string): ExerciseLog | undefined {
+        for (let i = workouts.value.length - 1; i >= 0; i--) {
+            const entry = workouts.value[i]?.log?.find(l => l.exerciseId === exerciseId && l.sets.length > 0);
+            if (entry) return entry;
+        }
+        return undefined;
+    }
 
     function load() {
         try {
@@ -64,6 +93,8 @@ export const useHistoryStore = defineStore("history", () => {
 
     return {
         workouts,
+        pendingLog,
+        lastLog,
         saveWorkout,
         getHistory,
         getById,

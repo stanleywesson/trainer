@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useHistoryStore } from '@/stores/history';
+import { useHistoryStore, type LoggedSet } from '@/stores/history';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -13,6 +13,13 @@ const difficultyColor = ['', 'text-green-400', 'text-blue-400', 'text-yellow-400
 
 function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function setChip(s: LoggedSet) {
+    const prefix = s.kind === 'warmup' ? 'W ' : s.kind === 'drop' ? 'Drop ' : ''
+    const amount = s.durationSeconds ? `${s.durationSeconds}s` : s.reps ? `${s.reps}` : 'max'
+    const weight = s.weightKg != null ? `${s.weightKg} kg` : 'BW'
+    return `${prefix}${weight} × ${amount}`
 }
 
 function formatDuration(seconds: number) {
@@ -60,6 +67,21 @@ function formatDuration(seconds: number) {
                 <span :class="['text-2xl font-bold', difficultyColor[workout.difficulty]]">
                     {{ difficultyLabel[workout.difficulty] }}
                 </span>
+            </div>
+
+            <!-- Logged sets & weights -->
+            <div v-if="workout.log?.length" class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-4">
+                <span class="text-xs text-gray-500 uppercase tracking-widest">Sets & weights</span>
+                <div v-for="entry in workout.log" :key="entry.exerciseId" class="flex flex-col gap-2">
+                    <span class="text-white text-sm font-semibold">{{ entry.exerciseName }}<span v-if="entry.perSide"
+                            class="text-gray-500 font-normal"> · per side</span></span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span v-for="(set, i) in entry.sets" :key="i" :class="['text-xs font-semibold px-2 py-1 rounded-lg',
+                            set.kind === 'warmup' ? 'bg-gray-700/60 text-gray-400'
+                                : set.kind === 'drop' ? 'bg-amber-500/15 text-amber-300'
+                                    : 'bg-indigo-500/15 text-indigo-200']">{{ setChip(set) }}</span>
+                    </div>
+                </div>
             </div>
         </div>
         </main>

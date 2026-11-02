@@ -7,6 +7,7 @@
     "estimatedMinutes": 20,
     "recommendation": "Start here. Do it 3× a week on non-consecutive days. When PU1 and PL1 feel easy at 12+, move to W2–W4.",
     "format": "sets",
+    "location": "home",
     "exercises": [
       {
         "exerciseId": "pu1",
@@ -44,6 +45,7 @@
     "estimatedMinutes": 30,
     "recommendation": "Chest, shoulders and triceps. Pair with W3 the next day.",
     "format": "sets",
+    "location": "home",
     "exercises": [
       {
         "exerciseId": "pu3",
@@ -80,6 +82,7 @@
     "estimatedMinutes": 20,
     "recommendation": "No bar needed. Counterbalances all the pushing and helps desk posture.",
     "format": "sets",
+    "location": "home",
     "exercises": [
       {
         "exerciseId": "pl1",
@@ -113,6 +116,7 @@
     "estimatedMinutes": 30,
     "recommendation": "Bar version of W3. Builds toward your first strict pull-ups.",
     "format": "sets",
+    "location": "home",
     "exercises": [
       {
         "exerciseId": "pl5",
@@ -150,6 +154,7 @@
     "estimatedMinutes": 30,
     "recommendation": "Single-leg focus is how you overload legs without weights. Rest well before a W2.",
     "format": "sets",
+    "location": "home",
     "exercises": [
       {
         "exerciseId": "lg3",
@@ -186,6 +191,7 @@
     "estimatedMinutes": 15,
     "recommendation": "Based on Heria's daily plank routine: 40s work / 20s rest, straight through, 2 rounds. Good as a short standalone or a finisher.",
     "format": "circuit",
+    "location": "home",
     "circuit": {
       "rounds": 2,
       "workSeconds": 40,
@@ -221,6 +227,7 @@
     "estimatedMinutes": 20,
     "recommendation": "Based on Heria's no-weights arm session: 40s work / 20s rest, 3 rounds. Biceps via pseudo planche and rows, triceps via skull crushers and dips.",
     "format": "circuit",
+    "location": "home",
     "circuit": {
       "rounds": 3,
       "workSeconds": 40,
@@ -253,6 +260,7 @@
     "estimatedMinutes": 20,
     "recommendation": "Builds the hollow and compression strength behind L-sits and handstands.",
     "format": "sets",
+    "location": "home",
     "exercises": [
       {
         "exerciseId": "co7",
@@ -292,6 +300,7 @@
     "estimatedMinutes": 40,
     "recommendation": "Classic Calisthenicmovement-style push/pull pairing. Needs a bar and dip station (or 2 sturdy chairs for dips).",
     "format": "sets",
+    "location": "home",
     "exercises": [
       {
         "exerciseId": "pl7",
@@ -334,6 +343,7 @@
     "estimatedMinutes": 30,
     "recommendation": "Heart rate up: 40s work / 20s rest, 4 rounds. Use it on a day you don't feel like strength work.",
     "format": "circuit",
+    "location": "home",
     "circuit": {
       "rounds": 4,
       "workSeconds": 40,
@@ -366,6 +376,7 @@
     "estimatedMinutes": 60,
     "recommendation": "Handstand, planche, front lever and L-sit work. Do skills first while fresh. Advanced only.",
     "format": "sets",
+    "location": "home",
     "exercises": [
       {
         "exerciseId": "vp3",
@@ -411,6 +422,329 @@
         "sets": 3,
         "reps": 0,
         "duration": 20
+      }
+    ]
+  },
+  {
+    "id": "gym1",
+    "name": "Back & Abs",
+    "category": "Back & Abs",
+    "difficulty": 4,
+    "estimatedMinutes": 60,
+    "recommendation": "Heavy barbell row early while fresh, then single-arm and cable rows. Face pulls keep the shoulders balanced. Pairs well 2–3 days after Back & Shoulders.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-lat-pulldown",
+        "warmupSets": 1,
+        "warmupReps": 20,
+        "sets": 4,
+        "reps": 10,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-barbell-row",
+        "sets": 4,
+        "reps": 8,
+        "repsMax": 10,
+        "restSeconds": 120
+      },
+      {
+        "exerciseId": "g-db-row",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-cable-row",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-face-pull",
+        "sets": 3,
+        "reps": 15,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-shrug",
+        "sets": 4,
+        "reps": 15,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "co20",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "co1",
+        "sets": 3,
+        "reps": 0,
+        "duration": 45,
+        "restSeconds": 45
+      }
+    ]
+  },
+  {
+    "id": "gym2",
+    "name": "Chest & Abs",
+    "category": "Chest & Abs",
+    "difficulty": 4,
+    "estimatedMinutes": 60,
+    "recommendation": "Presses first while fresh, flies after at moderate weight for a deep stretch. Push-ups to failure finish the chest.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-bench",
+        "warmupSets": 1,
+        "warmupReps": 20,
+        "sets": 4,
+        "reps": 8,
+        "repsMax": 10,
+        "restSeconds": 120
+      },
+      {
+        "exerciseId": "g-incline-smith",
+        "sets": 4,
+        "reps": 10,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-db-fly",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-pec-deck",
+        "sets": 3,
+        "reps": 15,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-close-grip-bench",
+        "sets": 4,
+        "reps": 10,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "pu3",
+        "sets": 3,
+        "reps": 0,
+        "max": true,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-crunch",
+        "sets": 4,
+        "reps": 25,
+        "restSeconds": 45
+      }
+    ]
+  },
+  {
+    "id": "gym3",
+    "name": "Back & Shoulders",
+    "category": "Back & Shoulders",
+    "difficulty": 4,
+    "estimatedMinutes": 60,
+    "recommendation": "Pump-style session: supersets, short rests and one drop set per muscle. Rear delts replace front raises for healthier shoulders.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-lat-pulldown",
+        "sets": 4,
+        "reps": 15,
+        "superset": "A",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-barbell-row",
+        "sets": 4,
+        "reps": 12,
+        "superset": "A",
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-db-row",
+        "sets": 4,
+        "reps": 12,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-cable-row",
+        "sets": 2,
+        "reps": 15,
+        "dropSet": {
+          "reps": 50,
+          "dropEvery": 10
+        },
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-shoulder-press",
+        "sets": 2,
+        "reps": 15,
+        "dropSet": {
+          "reps": 50,
+          "dropEvery": 10
+        },
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-lateral-raise",
+        "sets": 4,
+        "reps": 20,
+        "superset": "B",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-reverse-fly",
+        "sets": 4,
+        "reps": 15,
+        "superset": "B",
+        "restSeconds": 60
+      }
+    ]
+  },
+  {
+    "id": "gym4",
+    "name": "Leg Day 1",
+    "category": "Lower Body",
+    "difficulty": 4,
+    "estimatedMinutes": 60,
+    "recommendation": "Heavy squat and hinge day. Take the full rest on squats and RDLs; quality reps beat short rests here.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-walk",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-back-squat",
+        "warmupSets": 1,
+        "warmupReps": 12,
+        "sets": 4,
+        "reps": 8,
+        "repsMax": 10,
+        "restSeconds": 120
+      },
+      {
+        "exerciseId": "g-front-squat",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 120
+      },
+      {
+        "exerciseId": "g-step-up",
+        "sets": 4,
+        "reps": 10,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-rdl",
+        "sets": 4,
+        "reps": 10,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-leg-curl",
+        "sets": 4,
+        "reps": 15,
+        "superset": "A",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-leg-extension",
+        "sets": 4,
+        "reps": 15,
+        "superset": "A",
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-standing-calf",
+        "sets": 4,
+        "reps": 20,
+        "superset": "B",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-seated-calf",
+        "sets": 4,
+        "reps": 20,
+        "superset": "B",
+        "restSeconds": 60
+      }
+    ]
+  },
+  {
+    "id": "gym5",
+    "name": "Leg Day 2",
+    "category": "Lower Body",
+    "difficulty": 3,
+    "estimatedMinutes": 40,
+    "recommendation": "Machine-based quad pump plus hip thrusts for glutes, since Leg Day 1 already has heavy RDLs.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-leg-press",
+        "sets": 4,
+        "reps": 15,
+        "superset": "A",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-leg-extension",
+        "sets": 4,
+        "reps": 15,
+        "weight": 15,
+        "superset": "A",
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-hip-thrust",
+        "sets": 4,
+        "reps": 12,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-lunge",
+        "sets": 4,
+        "reps": 0,
+        "duration": 60,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-leg-curl",
+        "sets": 4,
+        "reps": 12,
+        "repsMax": 15,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "lg10",
+        "sets": 4,
+        "reps": 0,
+        "max": true,
+        "restSeconds": 40
       }
     ]
   }

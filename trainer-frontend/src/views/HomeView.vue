@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import WorkoutCard from '@/components/WorkoutCard.vue'
-import { workouts as workoutsData } from '@/data'
+import { workouts as workoutsData, workoutLocation, type WorkoutLocation } from '@/data'
 import { useHistoryStore } from '@/stores/history';
 
+const selectedLocation = ref<WorkoutLocation | null>(null);
 const selectedDuration = ref<number | null>(null);
 const selectedDifficulty = ref<number | null>(null);
 const historyStore = useHistoryStore();
 const appVersion = __APP_VERSION__;
 
+const locations: { value: WorkoutLocation, label: string }[] = [
+    { value: 'home', label: '🏠 Home' },
+    { value: 'gym', label: '🏋️ Gym' },
+];
 const durations = [15, 20, 30, 40, 60];
 const difficulties = [
     { value: 1, label: 'Easy' },
@@ -20,9 +25,14 @@ const difficulties = [
 
 const filteredWorkouts = computed(() =>
     workoutsData.filter(w =>
+        (!selectedLocation.value || workoutLocation(w) === selectedLocation.value) &&
         (!selectedDuration.value || w.estimatedMinutes === selectedDuration.value) &&
         (!selectedDifficulty.value || w.difficulty === selectedDifficulty.value))
 );
+
+function toggleLocation(l: WorkoutLocation) {
+    selectedLocation.value = selectedLocation.value === l ? null : l
+}
 
 function toggleDuration(d: number) {
     selectedDuration.value = selectedDuration.value === d ? null : d
@@ -47,6 +57,14 @@ function toggleDifficulty(d: number) {
         </header>
 
         <main class="flex-1 px-safe pb-safe pt-3">
+
+        <!-- Location filter -->
+        <div class="flex gap-2 mb-3">
+            <button v-for="l in locations" :key="l.value" @click="toggleLocation(l.value)" :class="[
+                'flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors',
+                selectedLocation === l.value ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-300'
+            ]">{{ l.label }}</button>
+        </div>
 
         <!-- Duration filter -->
         <div class="flex gap-2 mb-3 overflow-x-auto pb-1">

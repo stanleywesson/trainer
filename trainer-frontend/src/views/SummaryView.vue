@@ -30,7 +30,9 @@ function saveAndFinish() {
         durationSeconds: Math.floor(durationMs / 1000),
         difficulty: difficulty.value,
         completedExercises: completed,
+        ...(historyStore.pendingLog.length ? { log: historyStore.pendingLog } : {}),
     })
+    historyStore.pendingLog = []
     router.push('/');
 }
 </script>
