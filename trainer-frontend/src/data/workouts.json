@@ -937,5 +937,50 @@
         "restSeconds": 45
       }
     ]
+  },
+  {
+    "id": "hx1",
+    "name": "Hyrox Rounds",
+    "category": "Conditioning",
+    "difficulty": 4,
+    "estimatedMinutes": 55,
+    "recommendation": "Hyrox-style engine builder: 4 rounds of stations with a 400 m run between each. Keep every run at the same steady pace, and don't rest between stations. Tap Done after each one and the app times your rounds.",
+    "format": "rounds",
+    "location": "gym",
+    "rounds": 4,
+    "exercises": [
+      {
+        "exerciseId": "hx-sandbag-lunge",
+        "distance": 50
+      },
+      {
+        "exerciseId": "hx-run",
+        "distance": 400
+      },
+      {
+        "exerciseId": "hx-burpee-broad-jump",
+        "reps": 12
+      },
+      {
+        "exerciseId": "hx-run",
+        "distance": 400
+      },
+      {
+        "exerciseId": "hx-farmers-carry",
+        "distance": 50
+      },
+      {
+        "exerciseId": "hx-run",
+        "distance": 400
+      },
+      {
+        "exerciseId": "hx-wall-ball",
+        "reps": 35
+      },
+      {
+        "exerciseId": "hx-run",
+        "distance": 400
+      }
+    ]
   }
 ]

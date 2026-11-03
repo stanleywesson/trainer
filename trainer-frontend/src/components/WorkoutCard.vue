@@ -8,7 +8,7 @@ const props = defineProps<{
     category: string
     difficulty: number
     estimatedMinutes: number
-    format?: 'sets' | 'circuit'
+    format?: 'sets' | 'circuit' | 'rounds'
     location?: 'home' | 'gym'
     exercises: unknown[]
   }
@@ -29,6 +29,10 @@ const difficultyLabel = computed(() => difficultyLabels[props.workout.difficulty
         <span v-if="workout.format === 'circuit'"
           class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300">
           Circuit
+        </span>
+        <span v-if="workout.format === 'rounds'"
+          class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300">
+          For time
         </span>
         <span v-if="workout.location === 'gym'"
           class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300">

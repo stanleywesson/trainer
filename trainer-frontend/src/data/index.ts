@@ -1,7 +1,7 @@
 import exercisesJson from './exercises.json'
 import workoutsJson from './workouts.json'
 
-export type RepType = 'reps' | 'duration' | 'failure'
+export type RepType = 'reps' | 'duration' | 'failure' | 'distance'
 
 export interface Exercise {
   id: string
@@ -13,6 +13,8 @@ export interface Exercise {
   repType: RepType
   /** Seconds per set, for repType "duration" */
   defaultDuration?: number
+  /** Metres per set, for repType "distance" */
+  defaultDistance?: number
   /** Reps / time are per side (unilateral exercise) */
   perSide?: boolean
   restSeconds: number
@@ -43,6 +45,8 @@ export interface WorkoutExercise {
   repsMax?: number
   /** Seconds per set for timed exercises; falls back to exercise.defaultDuration */
   duration?: number
+  /** Metres per set for distance exercises; falls back to exercise.defaultDistance */
+  distance?: number
   warmupSets?: number
   warmupReps?: number
   /** Target weight in kg (pre-fills the weight input the first time) */
@@ -76,10 +80,16 @@ export interface Workout {
   difficulty: number
   estimatedMinutes: number
   recommendation: string
-  /** "sets": do all sets of one exercise, then move on. "circuit": timed intervals through every exercise, repeated for N rounds. */
-  format: 'sets' | 'circuit'
+  /**
+   * "sets": do all sets of one exercise, then move on.
+   * "circuit": timed intervals through every exercise, repeated for N rounds.
+   * "rounds": complete each station's target (reps / distance) and move straight on, repeated for N rounds; a stopwatch tracks the time.
+   */
+  format: 'sets' | 'circuit' | 'rounds'
   location?: WorkoutLocation
   circuit?: CircuitConfig
+  /** Number of rounds, for format "rounds" */
+  rounds?: number
   exercises: WorkoutExercise[]
 }
 
@@ -106,6 +116,7 @@ export interface PlannedExercise extends Exercise {
   reps: number
   repsMax?: number
   duration?: number
+  distance?: number
   warmupSets: number
   warmupReps: number
   weight?: number
@@ -125,6 +136,7 @@ export function planExercises(workout: Workout | undefined): PlannedExercise[] {
       reps,
       repsMax: entry.repsMax,
       duration: entry.duration ?? ex.defaultDuration,
+      distance: entry.distance ?? ex.defaultDistance,
       warmupSets: entry.warmupSets ?? 0,
       warmupReps: entry.warmupReps ?? reps,
       weight: entry.weight,
@@ -168,6 +180,7 @@ export function buildSets(p: PlannedExercise): SetSpec[] {
   const side = p.perSide ? ' / side' : ''
   const working = (): Omit<SetSpec, 'kind'> => {
     if (p.repType === 'duration') return { label: `${formatSeconds(p.duration ?? 0)}${side}`, reps: 0, duration: p.duration ?? 0 }
+    if (p.repType === 'distance') return { label: formatDistance(p.distance ?? 0), reps: 0 }
     if (p.repType === 'failure') return { label: `Max reps${side}`, reps: 0 }
     return { label: `${p.reps}${p.repsMax ? `–${p.repsMax}` : ''} reps${side}`, reps: p.reps }
   }
@@ -195,6 +208,7 @@ export function prescriptionLabel(p: PlannedExercise): string {
   const side = p.perSide ? ' / side' : ''
   let main: string
   if (p.repType === 'duration') main = p.sets === 1 ? formatSeconds(p.duration ?? 0) : `${p.sets} × ${formatSeconds(p.duration ?? 0)}`
+  else if (p.repType === 'distance') main = p.sets === 1 ? formatDistance(p.distance ?? 0) : `${p.sets} × ${formatDistance(p.distance ?? 0)}`
   else if (p.repType === 'failure') main = `${p.sets} × max`
   else main = `${p.sets} × ${p.reps}${p.repsMax ? `–${p.repsMax}` : ''}`
   const warm = p.warmupSets ? `${p.warmupSets} warm-up + ` : ''
@@ -214,6 +228,20 @@ export function videoLink(ex: Pick<Exercise, 'name' | 'source' | 'videoUrl'>): {
   const name = ex.name.split(' / ')[0]!.replace(/\s*\(.*\)/, '')
   const query = `${channel} ${name} tutorial`.trim()
   return { url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, direct: false }
+}
+
+/** 400 → "400 m", 1500 → "1.5 km" */
+export function formatDistance(m: number): string {
+  return m >= 1000 ? `${+(m / 1000).toFixed(2)} km` : `${m} m`
+}
+
+/** One station's target in a "rounds" workout: "50 m", "12 reps", "35 reps / side", "45s" */
+export function stationLabel(p: PlannedExercise): string {
+  const side = p.perSide ? ' / side' : ''
+  if (p.repType === 'distance') return formatDistance(p.distance ?? 0)
+  if (p.repType === 'duration') return `${formatSeconds(p.duration ?? 0)}${side}`
+  if (p.repType === 'failure') return `Max reps${side}`
+  return `${p.reps} reps${side}`
 }
 
 export function circuitLabel(c: CircuitConfig): string {

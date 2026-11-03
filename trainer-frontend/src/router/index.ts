@@ -40,6 +40,11 @@ const router = createRouter({
     component: () => import('@/views/CircuitView.vue'),
   },
   {
+    path: '/workout/:id/rounds',
+    name: 'rounds',
+    component: () => import('@/views/RoundsView.vue'),
+  },
+  {
     path: '/summary/:id',
     name: 'summary',
     component: () => import('@/views/SummaryView.vue'),
