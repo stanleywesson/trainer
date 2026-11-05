@@ -56,7 +56,7 @@ function done() {
 }
 
 function saveRun(minutes: number) {
-    if (entry.value) calendar.updateEntry(entry.value.id, { done: true, doneMinutes: minutes })
+    if (entry.value) calendar.logRun(entry.value.id, minutes)
     router.back()
 }
 

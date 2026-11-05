@@ -35,12 +35,13 @@ function toggleLocation(l: WorkoutLocation) {
     selectedLocation.value = selectedLocation.value === l ? null : l
 }
 
-function toggleDuration(d: number) {
-    selectedDuration.value = selectedDuration.value === d ? null : d
-}
+const hasFilters = computed(() =>
+    selectedLocation.value != null || selectedDuration.value != null || selectedDifficulty.value != null)
 
-function toggleDifficulty(d: number) {
-    selectedDifficulty.value = selectedDifficulty.value === d ? null : d
+function clearFilters() {
+    selectedLocation.value = null
+    selectedDuration.value = null
+    selectedDifficulty.value = null
 }
 
 </script>
@@ -71,25 +72,27 @@ function toggleDifficulty(d: number) {
             ]">{{ l.label }}</button>
         </div>
 
-        <!-- Duration filter -->
-        <div class="flex gap-2 mb-3 overflow-x-auto pb-1">
-            <button v-for="d in durations" :key="d" @click="toggleDuration(d)" :class="[
-                'shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors',
-                selectedDuration != null && selectedDuration === d ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400'
-            ]">{{ d }} min</button>
-        </div>
-
-        <!-- Difficulty filter -->
-        <div class="flex gap-2 mb-6 overflow-x-auto pb-1">
-            <button v-for="d in difficulties" :key="d.value" @click="toggleDifficulty(d.value)" :class="[
-                'shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors',
-                selectedDifficulty != null && selectedDifficulty === d.value ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400'
-            ]">{{ d.value }} · {{ d.label }}</button>
+        <!-- Duration & difficulty dropdowns (native selects open the phone's picker) -->
+        <div class="flex gap-2 mb-3">
+            <select v-model="selectedDuration" aria-label="Duration"
+                :class="['filter-select', selectedDuration != null ? 'filter-select-active' : '']">
+                <option :value="null">Any duration</option>
+                <option v-for="d in durations" :key="d" :value="d">{{ d }} min</option>
+            </select>
+            <select v-model="selectedDifficulty" aria-label="Difficulty"
+                :class="['filter-select', selectedDifficulty != null ? 'filter-select-active' : '']">
+                <option :value="null">Any difficulty</option>
+                <option v-for="d in difficulties" :key="d.value" :value="d.value">{{ d.value }} · {{ d.label }}</option>
+            </select>
         </div>
 
         <!-- Results count -->
-        <p class="text-xs text-gray-500 mb-4">{{ filteredWorkouts.length }} workout{{ filteredWorkouts.length !== 1 ?
-            's' : '' }}</p>
+        <div class="flex items-center justify-between mb-4 min-h-8">
+            <p class="text-xs text-gray-500">{{ filteredWorkouts.length }} workout{{ filteredWorkouts.length !== 1 ?
+                's' : '' }}</p>
+            <button v-if="hasFilters" @click="clearFilters" class="text-xs font-semibold text-indigo-300 px-2 py-1">
+                Clear filters</button>
+        </div>
 
         <div class="flex flex-col gap-4">
             <WorkoutCard v-for="workout in filteredWorkouts" :key="workout.id" :workout="workout" />

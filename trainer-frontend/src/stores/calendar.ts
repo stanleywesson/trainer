@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { WorkoutLocation } from '@/data'
 import { generatePlan, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId } from '@/data/plans'
-import { useHistoryStore } from '@/stores/history'
+import { RUN_WORKOUT_ID, useHistoryStore } from '@/stores/history'
 import { fromKey, toKey, todayKey } from '@/utils/date'
 
 interface CalendarState {
@@ -83,8 +83,62 @@ export const useCalendarStore = defineStore('calendar', () => {
 
   function removeEntry(id: string) {
     if (!state.value) return
+    // deleting a planned run from the calendar doesn't erase the run you actually did:
+    // the history record stays, just unlinked
+    history.unlinkRun(id)
     state.value.entries = state.value.entries.filter(e => e.id !== id)
     persist()
+  }
+
+  /** Runs are dated on their calendar day (now if that's today, else midday) so history and streaks agree */
+  function addRunToHistory(entryId: string, minutes: number) {
+    const day = state.value?.entries.find(e => e.id === entryId)?.date
+    const date = !day || day === todayKey()
+      ? new Date().toISOString()
+      : new Date(fromKey(day).getTime() + 12 * 3600_000).toISOString()
+    history.saveWorkout({
+      kind: 'run',
+      calendarEntryId: entryId,
+      workoutId: RUN_WORKOUT_ID,
+      workoutName: 'Run',
+      durationSeconds: minutes * 60,
+      difficulty: 0,
+      completedExercises: 0,
+    }, date)
+  }
+
+  /** Mark a planned run done and record it in history */
+  function logRun(entryId: string, minutes: number) {
+    const existing = history.runFor(entryId)
+    if (existing) history.removeWorkout(existing.id)
+    updateEntry(entryId, { done: true, doneMinutes: minutes })
+    addRunToHistory(entryId, minutes)
+  }
+
+  /** Un-log a run: clears the calendar tick and its history record */
+  function undoRun(entryId: string) {
+    const existing = history.runFor(entryId)
+    if (existing) history.removeWorkout(existing.id)
+    updateEntry(entryId, { done: false, doneMinutes: undefined })
+  }
+
+  /** Delete a history session; a run also un-ticks its calendar entry */
+  function deleteSession(sessionId: string) {
+    const session = history.getById(sessionId)
+    if (!session) return
+    history.removeWorkout(sessionId)
+    if (session.kind === 'run' && session.calendarEntryId) {
+      updateEntry(session.calendarEntryId, { done: false, doneMinutes: undefined })
+    }
+  }
+
+  /** Runs logged before history tracked runs: add them to history once */
+  function backfillRuns() {
+    for (const e of entries.value) {
+      if (e.type === 'jog' && e.done && e.doneMinutes && !history.runFor(e.id)) {
+        addRunToHistory(e.id, e.doneMinutes)
+      }
+    }
   }
 
   function entriesOn(date: string): CalendarEntry[] {
@@ -140,9 +194,11 @@ export const useCalendarStore = defineStore('calendar', () => {
   })
 
   load()
+  backfillRuns()
 
   return {
     state, needsSetup, entries, lastDate, streak,
     setup, reset, extend, addEntry, updateEntry, removeEntry, entriesOn, isDone, status,
+    logRun, undoRun, deleteSession,
   }
 })

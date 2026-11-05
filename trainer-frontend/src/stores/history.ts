@@ -27,7 +27,13 @@ export interface WorkoutSession {
     completedExercises: number
     /** Sets done with weights; absent on sessions saved before weight logging existed */
     log?: ExerciseLog[]
+    /** 'run' for logged runs; absent (= workout) on older sessions */
+    kind?: 'workout' | 'run'
+    /** For runs: the calendar entry this run completed */
+    calendarEntryId?: string
 }
+
+export const RUN_WORKOUT_ID = 'run'
 
 const STORAGE_KEY = 'trainer_history'
 
@@ -54,15 +60,39 @@ export const useHistoryStore = defineStore("history", () => {
         }
     }
 
-    function saveWorkout(workout: Omit<WorkoutSession, 'id' | 'date'>) {
+    function persist() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(workouts.value));
+    }
+
+    function saveWorkout(workout: Omit<WorkoutSession, 'id' | 'date'>, date = new Date().toISOString()) {
         const entry: WorkoutSession = {
             ...workout,
             id: crypto.randomUUID(),
-            date: new Date().toISOString()
+            date
         };
 
         workouts.value.push(entry);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(workouts.value));
+        // keep chronological order (backfilled runs may be dated in the past)
+        workouts.value.sort((a, b) => a.date.localeCompare(b.date));
+        persist();
+        return entry;
+    }
+
+    function removeWorkout(id: string) {
+        workouts.value = workouts.value.filter(w => w.id !== id);
+        persist();
+    }
+
+    function runFor(calendarEntryId: string): WorkoutSession | undefined {
+        return workouts.value.find(w => w.kind === 'run' && w.calendarEntryId === calendarEntryId);
+    }
+
+    /** Detach a run from a calendar entry that's being deleted (the run itself stays in history) */
+    function unlinkRun(calendarEntryId: string) {
+        const run = runFor(calendarEntryId);
+        if (!run) return;
+        delete run.calendarEntryId;
+        persist();
     }
 
     function getHistory(): WorkoutSession[] {
@@ -96,6 +126,9 @@ export const useHistoryStore = defineStore("history", () => {
         pendingLog,
         lastLog,
         saveWorkout,
+        removeWorkout,
+        runFor,
+        unlinkRun,
         getHistory,
         getById,
         workoutStreak

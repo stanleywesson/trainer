@@ -49,12 +49,12 @@ function startTimer() {
 }
 
 function saveRun(minutes: number) {
-    calendar.updateEntry(props.entry.id, { done: true, doneMinutes: minutes })
+    calendar.logRun(props.entry.id, minutes)
     logging.value = false
 }
 
 function undoRun() {
-    calendar.updateEntry(props.entry.id, { done: false, doneMinutes: undefined })
+    calendar.undoRun(props.entry.id)
 }
 
 function move(date: string) {
