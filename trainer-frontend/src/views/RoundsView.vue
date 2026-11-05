@@ -3,9 +3,11 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getWorkout, planExercises, stationLabel } from '@/data'
 import WatchLink from '@/components/WatchLink.vue'
+import { useHistoryStore, type ExerciseLog } from '@/stores/history'
 
 const route = useRoute()
 const router = useRouter()
+const historyStore = useHistoryStore()
 
 const workout = computed(() => getWorkout(route.params.id))
 const stations = computed(() => planExercises(workout.value))
@@ -117,7 +119,31 @@ function undo() {
     done.value--
 }
 
+/** One set per station per completed round; reps/time/distance as planned */
+function buildLog(): ExerciseLog[] {
+    const n = stations.value.length
+    return stations.value.flatMap((p, i) => {
+        const count = done.value > i ? Math.floor((done.value - i - 1) / n) + 1 : 0
+        if (!count) return []
+        const reps = p.repType === 'reps' ? p.reps : 0
+        return [{
+            exerciseId: p.id,
+            exerciseName: p.name,
+            ...(p.perSide ? { perSide: true } : {}),
+            sets: Array.from({ length: count }, () => ({
+                kind: 'working' as const,
+                reps,
+                targetReps: reps,
+                ...(p.repType === 'duration' && p.duration ? { durationSeconds: p.duration } : {}),
+                ...(p.repType === 'distance' && p.distance ? { distanceMeters: p.distance } : {}),
+                weightKg: p.weighted ? p.weight ?? null : null,
+            })),
+        }]
+    })
+}
+
 function finish() {
+    historyStore.pendingLog = buildLog()
     const active = activeMs(Date.now())
     clearInterval(ticker)
     releaseWakeLock()

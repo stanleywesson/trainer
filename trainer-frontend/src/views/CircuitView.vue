@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { circuitLabel, getWorkout, planExercises, type PlannedExercise } from '@/data'
 import WatchLink from '@/components/WatchLink.vue'
 import { useIntervalTimer } from '@/composables/useIntervalTimer'
+import { useHistoryStore, type ExerciseLog } from '@/stores/history'
 
 type StepKind = 'ready' | 'work' | 'rest' | 'roundRest'
 interface Step {
@@ -19,6 +20,7 @@ const GET_READY_SECONDS = 5
 
 const route = useRoute()
 const router = useRouter()
+const historyStore = useHistoryStore()
 
 const workout = computed(() => getWorkout(route.params.id))
 const exercises = computed(() => planExercises(workout.value))
@@ -49,13 +51,39 @@ const steps = computed<Step[]>(() => {
 const totalWorkSteps = computed(() => steps.value.filter(s => s.kind === 'work').length)
 
 const completedIntervals = ref(0)
+/** Work intervals finished per exercise, for the history log */
+const intervalsByExercise = ref<number[]>([])
 
 const { started, paused, step, startTime, remainingSeconds, stepProgress, overallProgress, start, togglePause, skip, stop } =
     useIntervalTimer(steps, {
         isWork: s => s.kind === 'work',
-        onStepEnd: (s, skipped) => { if (s.kind === 'work' && !skipped) completedIntervals.value++ },
+        onStepEnd: (s, skipped) => {
+            if (s.kind !== 'work' || skipped) return
+            completedIntervals.value++
+            intervalsByExercise.value[s.exerciseIndex] = (intervalsByExercise.value[s.exerciseIndex] ?? 0) + 1
+        },
         onFinish: finish,
     })
+
+/** One timed set per finished interval */
+function buildLog(): ExerciseLog[] {
+    return exercises.value.flatMap((p, i) => {
+        const count = intervalsByExercise.value[i] ?? 0
+        if (!count) return []
+        return [{
+            exerciseId: p.id,
+            exerciseName: p.name,
+            ...(p.perSide ? { perSide: true } : {}),
+            sets: Array.from({ length: count }, () => ({
+                kind: 'working' as const,
+                reps: 0,
+                targetReps: 0,
+                durationSeconds: circuit.value.workSeconds,
+                weightKg: p.weighted ? p.weight ?? null : null,
+            })),
+        }]
+    })
+}
 
 const phase = computed(() => {
     switch (step.value?.kind) {
@@ -67,6 +95,7 @@ const phase = computed(() => {
 })
 
 function finish() {
+    historyStore.pendingLog = buildLog()
     router.push({
         name: 'summary',
         params: { id: route.params.id },

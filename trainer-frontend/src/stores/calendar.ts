@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { WorkoutLocation } from '@/data'
-import { generatePlan, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId } from '@/data/plans'
+import { generatePlan, jogLabel, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId } from '@/data/plans'
 import { RUN_WORKOUT_ID, useHistoryStore } from '@/stores/history'
 import { fromKey, toKey, todayKey } from '@/utils/date'
 
@@ -91,8 +91,9 @@ export const useCalendarStore = defineStore('calendar', () => {
   }
 
   /** Runs are dated on their calendar day (now if that's today, else midday) so history and streaks agree */
-  function addRunToHistory(entryId: string, minutes: number) {
-    const day = state.value?.entries.find(e => e.id === entryId)?.date
+  function addRunToHistory(entryId: string, minutes: number, distanceKm?: number | null) {
+    const entry = state.value?.entries.find(e => e.id === entryId)
+    const day = entry?.date
     const date = !day || day === todayKey()
       ? new Date().toISOString()
       : new Date(fromKey(day).getTime() + 12 * 3600_000).toISOString()
@@ -104,15 +105,17 @@ export const useCalendarStore = defineStore('calendar', () => {
       durationSeconds: minutes * 60,
       difficulty: 0,
       completedExercises: 0,
+      ...(distanceKm ? { distanceKm } : {}),
+      ...(entry?.jog ? { plannedRun: jogLabel(entry.jog) } : {}),
     }, date)
   }
 
   /** Mark a planned run done and record it in history */
-  function logRun(entryId: string, minutes: number) {
+  function logRun(entryId: string, minutes: number, distanceKm?: number | null) {
     const existing = history.runFor(entryId)
     if (existing) history.removeWorkout(existing.id)
     updateEntry(entryId, { done: true, doneMinutes: minutes })
-    addRunToHistory(entryId, minutes)
+    addRunToHistory(entryId, minutes, distanceKm)
   }
 
   /** Un-log a run: clears the calendar tick and its history record */

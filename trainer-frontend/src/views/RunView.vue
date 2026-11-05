@@ -55,8 +55,8 @@ function done() {
     logMinutes.value = Math.max(1, Math.round(activeSeconds() / 60))
 }
 
-function saveRun(minutes: number) {
-    if (entry.value) calendar.logRun(entry.value.id, minutes)
+function saveRun(minutes: number, distanceKm: number | null) {
+    if (entry.value) calendar.logRun(entry.value.id, minutes, distanceKm)
     router.back()
 }
 

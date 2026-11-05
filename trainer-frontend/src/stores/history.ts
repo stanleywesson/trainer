@@ -3,9 +3,13 @@ import { computed, ref } from "vue";
 
 export interface LoggedSet {
     kind: 'warmup' | 'working' | 'drop'
-    /** Target reps (0 for timed / max sets) */
+    /** Reps done. Sessions saved before v1.3.3 hold the target here (no targetReps). 0 = timed / not entered */
     reps: number
+    /** Planned reps (0 for timed / max sets); absent on older sessions */
+    targetReps?: number
     durationSeconds?: number
+    /** Distance-based sets (rows, carries…) */
+    distanceMeters?: number
     /** null = bodyweight / not entered */
     weightKg: number | null
 }
@@ -31,6 +35,10 @@ export interface WorkoutSession {
     kind?: 'workout' | 'run'
     /** For runs: the calendar entry this run completed */
     calendarEntryId?: string
+    /** For runs: distance covered, if entered */
+    distanceKm?: number
+    /** For runs: what the plan asked for, e.g. "Run 2 min / walk 1 min × 6" */
+    plannedRun?: string
 }
 
 export const RUN_WORKOUT_ID = 'run'

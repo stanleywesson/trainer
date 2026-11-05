@@ -8,11 +8,14 @@ const props = defineProps<{
     /** Show a kg input per set */
     weighted: boolean
     weights: (number | null)[]
+    /** Actual reps per set (pre-filled with the target); null = not entered */
+    reps: (number | null)[]
 }>();
 
 const emit = defineEmits<{
     complete: [index: number]
     weight: [index: number, value: number | null]
+    reps: [index: number, value: number | null]
 }>();
 
 const STEP = 2.5
@@ -29,6 +32,11 @@ function onInput(index: number, raw: string) {
     emit('weight', index, Number.isFinite(value) && value >= 0 ? value : null)
 }
 
+function onReps(index: number, raw: string) {
+    const value = parseInt(raw, 10)
+    emit('reps', index, Number.isFinite(value) && value >= 0 ? value : null)
+}
+
 function nudge(index: number, delta: number) {
     const current = props.weights[index] ?? 0
     const next = Math.max(0, Math.round((current + delta) * 10) / 10)
@@ -40,10 +48,10 @@ function nudge(index: number, delta: number) {
     <div class="flex flex-col gap-2">
         <div class="flex items-center justify-between text-sm text-gray-400">
             <span>{{ completed }}/{{ sets.length }} sets complete</span>
-            <span v-if="weighted" class="text-xs text-gray-500">kg · empty = bodyweight</span>
+            <span class="text-xs text-gray-500">{{ weighted ? 'kg × reps · empty kg = bodyweight' : 'reps done' }}</span>
         </div>
 
-        <div v-for="(set, i) in sets" :key="i" :class="['flex items-center gap-3 rounded-xl px-2 py-1.5',
+        <div v-for="(set, i) in sets" :key="i" :class="['flex items-center gap-2 rounded-xl px-2 py-1.5',
             i === completed ? 'bg-gray-700/40' : '']">
             <button @click="emit('complete', i)" :disabled="i !== completed"
                 :aria-label="`Complete set ${marker(i)}`" :class="[
@@ -65,13 +73,21 @@ function nudge(index: number, delta: number) {
 
             <div v-if="weighted" class="flex items-center shrink-0">
                 <button @click="nudge(i, -STEP)" aria-label="Decrease weight"
-                    class="w-9 h-11 rounded-l-xl bg-gray-700 text-gray-200 font-bold active:bg-gray-600">−</button>
+                    class="w-8 h-11 rounded-l-xl bg-gray-700 text-gray-200 font-bold active:bg-gray-600">−</button>
                 <input type="text" inputmode="decimal" :value="weights[i] ?? ''" placeholder="BW"
                     @change="onInput(i, ($event.target as HTMLInputElement).value)" :aria-label="`Weight for set ${marker(i)} in kg`"
-                    class="w-14 h-11 bg-gray-900 text-center text-white font-semibold border-y border-gray-700 placeholder:text-gray-600 focus:outline-none focus:border-indigo-500" />
+                    class="w-12 h-11 bg-gray-900 text-center text-white font-semibold border-y border-gray-700 placeholder:text-gray-600 focus:outline-none focus:border-indigo-500" />
                 <button @click="nudge(i, STEP)" aria-label="Increase weight"
-                    class="w-9 h-11 rounded-r-xl bg-gray-700 text-gray-200 font-bold active:bg-gray-600">+</button>
+                    class="w-8 h-11 rounded-r-xl bg-gray-700 text-gray-200 font-bold active:bg-gray-600">+</button>
             </div>
+
+            <!-- Actual reps (timed sets are logged by the timer instead) -->
+            <template v-if="!set.duration">
+                <span v-if="weighted" class="text-gray-500 text-sm shrink-0">×</span>
+                <input type="text" inputmode="numeric" :value="reps[i] ?? ''" placeholder="reps"
+                    @change="onReps(i, ($event.target as HTMLInputElement).value)" :aria-label="`Reps done in set ${marker(i)}`"
+                    class="w-12 h-11 shrink-0 rounded-xl bg-gray-900 text-center text-white font-semibold border border-gray-700 placeholder:text-gray-600 placeholder:text-xs focus:outline-none focus:border-indigo-500" />
+            </template>
         </div>
     </div>
 </template>

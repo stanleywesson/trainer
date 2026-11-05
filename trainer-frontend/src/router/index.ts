@@ -55,6 +55,11 @@ const router = createRouter({
     component: () => import('@/views/HistoryView.vue'),
   },
   {
+    path: '/history/exercise/:exerciseId',
+    name: 'exerciseHistory',
+    component: () => import('@/views/ExerciseHistoryView.vue'),
+  },
+  {
     path: '/history/:id',
     name: 'historyDetail',
     component: () => import('@/views/HistoryDetailView.vue'),

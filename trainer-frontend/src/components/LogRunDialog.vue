@@ -7,16 +7,18 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    save: [minutes: number]
+    save: [minutes: number, distanceKm: number | null]
     cancel: []
 }>()
 
 const quick = [20, 30, 45]
 const minutes = ref<string>(String(props.defaultMinutes || ''))
+const distance = ref<string>('')
 
 function save() {
     const m = parseInt(minutes.value, 10)
-    if (Number.isFinite(m) && m > 0) emit('save', m)
+    const km = parseFloat(distance.value.replace(',', '.'))
+    if (Number.isFinite(m) && m > 0) emit('save', m, Number.isFinite(km) && km > 0 ? Math.round(km * 100) / 100 : null)
 }
 </script>
 
@@ -35,11 +37,19 @@ function save() {
                 ]">{{ q }} min</button>
             </div>
 
-            <label class="flex items-center gap-3">
-                <input v-model="minutes" type="text" inputmode="numeric" placeholder="Minutes"
-                    class="flex-1 h-12 rounded-xl bg-gray-900 border border-gray-700 px-4 text-white text-lg font-semibold focus:outline-none focus:border-emerald-500" />
-                <span class="text-gray-400">min</span>
-            </label>
+            <div class="flex gap-3">
+                <label class="flex-1 flex items-center gap-2 min-w-0">
+                    <input v-model="minutes" type="text" inputmode="numeric" placeholder="Minutes"
+                        class="w-full min-w-0 h-12 rounded-xl bg-gray-900 border border-gray-700 px-4 text-white text-lg font-semibold focus:outline-none focus:border-emerald-500" />
+                    <span class="text-gray-400 shrink-0">min</span>
+                </label>
+                <label class="flex-1 flex items-center gap-2 min-w-0">
+                    <input v-model="distance" type="text" inputmode="decimal" placeholder="Optional"
+                        aria-label="Distance in kilometres (optional)"
+                        class="w-full min-w-0 h-12 rounded-xl bg-gray-900 border border-gray-700 px-4 text-white text-lg font-semibold placeholder:text-sm placeholder:font-normal placeholder:text-gray-600 focus:outline-none focus:border-emerald-500" />
+                    <span class="text-gray-400 shrink-0">km</span>
+                </label>
+            </div>
 
             <div class="flex gap-3">
                 <button @click="emit('cancel')"

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useHistoryStore, type LoggedSet } from '@/stores/history';
+import { useHistoryStore } from '@/stores/history';
 import { useCalendarStore } from '@/stores/calendar';
 import { useRoute, useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import ExerciseSetsTable from '@/components/ExerciseSetsTable.vue';
+import { formatClock, formatDuration, formatPace } from '@/utils/format';
 
 const route = useRoute();
 const router = useRouter();
@@ -26,17 +28,26 @@ function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-function setChip(s: LoggedSet) {
-    const prefix = s.kind === 'warmup' ? 'W ' : s.kind === 'drop' ? 'Drop ' : ''
-    const amount = s.durationSeconds ? `${s.durationSeconds}s` : s.reps ? `${s.reps}` : 'max'
-    const weight = s.weightKg != null ? `${s.weightKg} kg` : 'BW'
-    return `${prefix}${weight} × ${amount}`
-}
+/** Saved time is when the session ended; start = end − duration */
+const timeRange = computed(() => {
+    const w = workout.value
+    if (!w || !w.durationSeconds) return ''
+    const end = new Date(w.date)
+    const start = new Date(end.getTime() - w.durationSeconds * 1000)
+    return `${formatClock(start)} – ${formatClock(end)}`
+})
 
-function formatDuration(seconds: number) {
-    const m = Math.floor(seconds / 60)
-    const s = seconds % 60
-    return `${m}m ${s}s`
+const totals = computed(() => {
+    const work = (workout.value?.log ?? []).flatMap(l => l.sets).filter(s => s.kind !== 'warmup')
+    return {
+        sets: work.length,
+        reps: work.reduce((n, s) => n + (s.durationSeconds ? 0 : s.reps), 0),
+        volume: Math.round(work.reduce((n, s) => n + (s.weightKg ?? 0) * (s.durationSeconds ? 0 : s.reps), 0)),
+    }
+})
+
+function openExercise(exerciseId: string) {
+    router.push({ name: 'exerciseHistory', params: { exerciseId } })
 }
 </script>
 
@@ -61,46 +72,81 @@ function formatDuration(seconds: number) {
         <div v-else class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
                 <h2 class="text-xl font-bold text-white">{{ workout.workoutName }}</h2>
-                <p class="text-gray-400 text-sm">{{ formatDate(workout.date) }}</p>
+                <p class="text-gray-400 text-sm">{{ formatDate(workout.date) }}<template v-if="timeRange && !isRun">
+                    · {{ timeRange }}</template></p>
             </div>
 
-            <div v-if="isRun" class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-1">
-                <span class="text-xs text-gray-500 uppercase tracking-widest">Time run</span>
-                <span class="text-2xl font-bold text-white">{{ Math.round(workout.durationSeconds / 60) }} min</span>
-            </div>
-
-            <div v-else class="grid grid-cols-2 gap-3">
-                <div class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-1">
-                    <span class="text-xs text-gray-500 uppercase tracking-widest">Duration</span>
-                    <span class="text-2xl font-bold text-white">{{ formatDuration(workout.durationSeconds) }}</span>
-                </div>
-                <div class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-1">
-                    <span class="text-xs text-gray-500 uppercase tracking-widest">Exercises</span>
-                    <span class="text-2xl font-bold text-white">{{ workout.completedExercises }}</span>
-                </div>
-            </div>
-
-            <div v-if="!isRun" class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-1">
-                <span class="text-xs text-gray-500 uppercase tracking-widest">Difficulty</span>
-                <span :class="['text-2xl font-bold', difficultyColor[workout.difficulty]]">
-                    {{ difficultyLabel[workout.difficulty] }}
-                </span>
-            </div>
-
-            <!-- Logged sets & weights -->
-            <div v-if="workout.log?.length" class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-4">
-                <span class="text-xs text-gray-500 uppercase tracking-widest">Sets & weights</span>
-                <div v-for="entry in workout.log" :key="entry.exerciseId" class="flex flex-col gap-2">
-                    <span class="text-white text-sm font-semibold">{{ entry.exerciseName }}<span v-if="entry.perSide"
-                            class="text-gray-500 font-normal"> · per side</span></span>
-                    <div class="flex flex-wrap gap-1.5">
-                        <span v-for="(set, i) in entry.sets" :key="i" :class="['text-xs font-semibold px-2 py-1 rounded-lg',
-                            set.kind === 'warmup' ? 'bg-gray-700/60 text-gray-400'
-                                : set.kind === 'drop' ? 'bg-amber-500/15 text-amber-300'
-                                    : 'bg-indigo-500/15 text-indigo-200']">{{ setChip(set) }}</span>
+            <!-- Run -->
+            <template v-if="isRun">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="stat-tile">
+                        <span class="stat-label">Time</span>
+                        <span class="stat-value">{{ formatDuration(workout.durationSeconds) }}</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-label">Distance</span>
+                        <span class="stat-value">{{ workout.distanceKm ? `${workout.distanceKm} km` : '–' }}</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-label">Pace</span>
+                        <span class="stat-value">{{ workout.distanceKm ? formatPace(workout.durationSeconds, workout.distanceKm) : '–' }}</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-label">Logged at</span>
+                        <span class="stat-value">{{ formatClock(new Date(workout.date)) }}</span>
                     </div>
                 </div>
-            </div>
+                <div v-if="workout.plannedRun" class="stat-tile">
+                    <span class="stat-label">Planned</span>
+                    <span class="text-white font-semibold">{{ workout.plannedRun }}</span>
+                </div>
+            </template>
+
+            <!-- Workout -->
+            <template v-else>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="stat-tile">
+                        <span class="stat-label">Duration</span>
+                        <span class="stat-value">{{ formatDuration(workout.durationSeconds) }}</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-label">Difficulty</span>
+                        <span class="stat-value"><span :class="difficultyColor[workout.difficulty]">
+                            {{ difficultyLabel[workout.difficulty] || '–' }}</span></span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-label">Exercises</span>
+                        <span class="stat-value">{{ workout.completedExercises }}</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-label">Work sets</span>
+                        <span class="stat-value">{{ totals.sets || '–' }}</span>
+                    </div>
+                    <div v-if="totals.reps" class="stat-tile">
+                        <span class="stat-label">Total reps</span>
+                        <span class="stat-value">{{ totals.reps }}</span>
+                    </div>
+                    <div v-if="totals.volume" class="stat-tile">
+                        <span class="stat-label">Volume</span>
+                        <span class="stat-value">{{ totals.volume.toLocaleString() }} kg</span>
+                    </div>
+                </div>
+
+                <!-- Each exercise: full set-by-set log; tap the name for that exercise's past sessions -->
+                <div v-for="entry in workout.log" :key="entry.exerciseId"
+                    class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <button @click="openExercise(entry.exerciseId)"
+                        class="flex items-center justify-between gap-2 text-left -my-1 py-1 min-h-11">
+                        <span class="text-white font-semibold">{{ entry.exerciseName }}<span v-if="entry.perSide"
+                                class="text-gray-500 font-normal text-sm"> · per side</span></span>
+                        <span class="text-xs font-semibold text-indigo-300 shrink-0">All sessions ›</span>
+                    </button>
+                    <ExerciseSetsTable :log="entry" />
+                </div>
+
+                <p v-if="!workout.log?.length" class="text-sm text-gray-500 text-center">
+                    No set-by-set data was saved for this session. Sessions from v1.3.4 on save every exercise.</p>
+            </template>
         </div>
         </main>
 

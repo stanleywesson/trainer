@@ -20,6 +20,8 @@ const blocks: number[][] = groupBlocks(planned).map(group => group.map(p => plan
 const currentBlock = ref(0);
 const completed = ref<number[]>(planned.map(() => 0));
 const weights = ref<(number | null)[][]>(planned.map((p, i) => prefillWeights(p, specs[i]!)));
+/** Actual reps per set, pre-filled with the target (null for max/timed sets until entered) */
+const repsDone = ref<(number | null)[][]>(specs.map(sets => sets.map(s => (!s.duration && s.reps) ? s.reps : null)));
 const startTime = Date.now();
 const completedCount = ref(0);
 
@@ -50,6 +52,10 @@ function prefillWeights(p: PlannedExercise, sets: SetSpec[]): (number | null)[] 
 
 function setWeight(exIdx: number, setIdx: number, value: number | null) {
     weights.value[exIdx]![setIdx] = value;
+}
+
+function setReps(exIdx: number, setIdx: number, value: number | null) {
+    repsDone.value[exIdx]![setIdx] = value;
 }
 
 function completeSet(exIdx: number, setIdx: number) {
@@ -93,8 +99,10 @@ function buildLog(): ExerciseLog[] {
             ...(p.perSide ? { perSide: true } : {}),
             sets: specs[i]!.slice(0, done).map((s, j) => ({
                 kind: s.kind,
-                reps: s.reps,
+                reps: repsDone.value[i]![j] ?? s.reps,
+                targetReps: s.reps,
                 ...(s.duration ? { durationSeconds: s.duration } : {}),
+                ...(p.repType === 'distance' && p.distance ? { distanceMeters: p.distance } : {}),
                 weightKg: p.weighted ? weights.value[i]![j] ?? null : null,
             })),
         }];
@@ -106,8 +114,13 @@ function finishEarly() {
 }
 
 function next(skipped = false) {
-    if (!skipped)
+    if (!skipped) {
         completedCount.value += blockIndices.value.length;
+        // "Next" without ticking any set circles = did the exercise as planned: log all its sets
+        for (const i of blockIndices.value) {
+            if (completed.value[i] === 0) completed.value[i] = specs[i]!.length;
+        }
+    }
 
     if (isLastBlock.value) {
         historyStore.pendingLog = buildLog();
@@ -178,8 +191,9 @@ function supersetTag(position: number) {
                 <WatchLink :exercise="planned[exIdx]!" />
 
                 <SetTracker :sets="specs[exIdx]!" :completed="completed[exIdx]!"
-                    :weighted="!!planned[exIdx]!.weighted" :weights="weights[exIdx]!" class="mt-1"
-                    @complete="completeSet(exIdx, $event)" @weight="(s, v) => setWeight(exIdx, s, v)" />
+                    :weighted="!!planned[exIdx]!.weighted" :weights="weights[exIdx]!" :reps="repsDone[exIdx]!" class="mt-1"
+                    @complete="completeSet(exIdx, $event)" @weight="(s, v) => setWeight(exIdx, s, v)"
+                    @reps="(s, v) => setReps(exIdx, s, v)" />
 
                 <div class="text-sm text-gray-400 flex flex-col gap-1">
                     <span><span class="text-gray-500">Tempo: </span>{{ planned[exIdx]!.tempo }}</span>

@@ -48,8 +48,8 @@ function startTimer() {
     router.push({ name: 'run', params: { entryId: props.entry.id } })
 }
 
-function saveRun(minutes: number) {
-    calendar.logRun(props.entry.id, minutes)
+function saveRun(minutes: number, distanceKm: number | null) {
+    calendar.logRun(props.entry.id, minutes, distanceKm)
     logging.value = false
 }
 
