@@ -18,7 +18,8 @@ export default defineConfig({
     vueDevTools(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' so a new version waits until src/pwa.ts says it's safe to reload
+      registerType: 'prompt',
       // Registration is done manually in src/pwa.ts so we can force update checks
       injectRegister: false,
       manifest: {
@@ -39,9 +40,6 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,json,png,svg,ico}'],
-        // New service worker takes over immediately instead of waiting for all tabs to close
-        skipWaiting: true,
-        clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html'
       }

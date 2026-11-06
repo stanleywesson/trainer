@@ -18,6 +18,7 @@ const emit = defineEmits<{
                 <h2 class="text-lg font-bold text-white">{{ title }}</h2>
                 <p v-if="message" class="text-sm text-gray-400">{{ message }}</p>
             </div>
+            <slot />
             <div class="flex gap-3">
                 <button @click="emit('cancel')"
                     class="px-6 py-4 rounded-2xl border border-gray-600 text-gray-200 font-semibold active:scale-95 transition-transform">

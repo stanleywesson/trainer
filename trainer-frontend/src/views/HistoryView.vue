@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import BackupPanel from '@/components/BackupPanel.vue'
 import { useHistoryStore, type WorkoutSession } from '@/stores/history';
 import { formatDuration } from '@/utils/format';
 
@@ -52,6 +53,8 @@ function openDetail(workout: WorkoutSession) {
 
         <main class="flex-1 px-safe pt-3 pb-safe flex flex-col gap-4">
         <h1 class="text-3xl font-bold text-white">History</h1>
+
+        <BackupPanel />
 
         <div class="flex gap-1 p-1 rounded-xl bg-gray-800">
             <button v-for="t in (['sessions', 'exercises'] as const)" :key="t" @click="setTab(t)" :class="[

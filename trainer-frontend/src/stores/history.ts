@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { keepUnreadable } from "@/utils/backup";
 
 export interface LoggedSet {
     kind: 'warmup' | 'working' | 'drop'
@@ -60,10 +61,15 @@ export const useHistoryStore = defineStore("history", () => {
     }
 
     function load() {
+        const raw = localStorage.getItem(STORAGE_KEY);
         try {
-            workouts.value = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+            const parsed = JSON.parse(raw ?? '[]');
+            if (!Array.isArray(parsed)) throw new Error('not a list');
+            workouts.value = parsed;
         }
         catch {
+            // set it aside first: the next save would otherwise overwrite it for good
+            keepUnreadable(STORAGE_KEY, raw);
             workouts.value = [];
         }
     }
@@ -84,6 +90,25 @@ export const useHistoryStore = defineStore("history", () => {
         workouts.value.sort((a, b) => a.date.localeCompare(b.date));
         persist();
         return entry;
+    }
+
+    /** Sessions from a backup that aren't on this phone yet */
+    function newSessions(sessions: WorkoutSession[]): WorkoutSession[] {
+        const known = new Set(workouts.value.map(w => w.id));
+        return sessions.filter(s => {
+            if (known.has(s.id)) return false;
+            known.add(s.id);
+            return true;
+        });
+    }
+
+    /** Adds a backup's sessions; never changes or removes what's already here */
+    function importSessions(sessions: WorkoutSession[]) {
+        const fresh = newSessions(sessions);
+        if (!fresh.length) return;
+        workouts.value.push(...fresh);
+        workouts.value.sort((a, b) => a.date.localeCompare(b.date));
+        persist();
     }
 
     function removeWorkout(id: string) {
@@ -135,6 +160,8 @@ export const useHistoryStore = defineStore("history", () => {
         lastLog,
         saveWorkout,
         removeWorkout,
+        newSessions,
+        importSessions,
         runFor,
         unlinkRun,
         getHistory,

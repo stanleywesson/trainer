@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { PLANS, type PlanId } from '@/data/plans'
 import type { WorkoutLocation } from '@/data'
+import BackupPanel from '@/components/BackupPanel.vue'
 import { useCalendarStore } from '@/stores/calendar'
 import { formatDayLong, nextMonday, toKey, todayKey } from '@/utils/date'
 
@@ -42,6 +43,11 @@ function finish() {
     router.replace({ name: 'home' })
 }
 
+/** A backup with a calendar replaces plan setup; one without still needs a plan chosen */
+function restored() {
+    if (!calendar.needsSetup) router.replace({ name: 'home' })
+}
+
 function skip() {
     plan.value = 'custom'
     finish()
@@ -78,6 +84,7 @@ function skip() {
                     <span class="text-sm font-semibold text-indigo-300">{{ p.tagline }}</span>
                     <span class="text-sm text-gray-400">{{ p.description }}</span>
                 </button>
+                <BackupPanel restore-only @restored="restored" />
             </template>
 
             <!-- 2: location -->

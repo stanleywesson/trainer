@@ -3,9 +3,10 @@ import { computed, ref } from 'vue'
 import type { WorkoutLocation } from '@/data'
 import { generatePlan, jogLabel, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId } from '@/data/plans'
 import { RUN_WORKOUT_ID, useHistoryStore } from '@/stores/history'
+import { keepUnreadable } from '@/utils/backup'
 import { fromKey, toKey, todayKey } from '@/utils/date'
 
-interface CalendarState {
+export interface CalendarState {
   plan: PlanId
   location: WorkoutLocation
   startDate: string
@@ -22,9 +23,14 @@ export const useCalendarStore = defineStore('calendar', () => {
   const history = useHistoryStore()
 
   function load() {
+    const raw = localStorage.getItem(STORAGE_KEY)
     try {
-      state.value = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
+      const parsed = JSON.parse(raw ?? 'null')
+      if (parsed !== null && !Array.isArray(parsed?.entries)) throw new Error('not a calendar')
+      state.value = parsed
     } catch {
+      // set it aside first: the next save would otherwise overwrite it for good
+      keepUnreadable(STORAGE_KEY, raw)
       state.value = null
     }
   }
@@ -135,6 +141,37 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
+  /** How a backup's calendar relates to this one. 'different' = another plan, so merging would double it up */
+  function importMode(incoming: CalendarState | null): 'none' | 'restore' | 'merge' | 'different' {
+    if (!incoming) return 'none'
+    if (!state.value?.entries.length) return 'restore'
+    const ids = new Set(state.value.entries.map(e => e.id))
+    if (incoming.entries.some(e => ids.has(e.id))) return 'merge'
+    return incoming.entries.length ? 'different' : 'none'
+  }
+
+  function importCalendar(incoming: CalendarState | null, replaceDifferent: boolean) {
+    const mode = importMode(incoming)
+    if (!incoming || mode === 'none' || (mode === 'different' && !replaceDifferent)) return
+    const current = state.value
+    if (mode === 'merge' && current) {
+      const byId = new Map(current.entries.map(e => [e.id, e]))
+      for (const e of incoming.entries) {
+        const local = byId.get(e.id)
+        if (!local) {
+          current.entries.push(e)
+        } else if (e.done && !local.done) {
+          local.done = true
+          local.doneMinutes = e.doneMinutes
+        }
+      }
+      current.weeksGenerated = Math.max(current.weeksGenerated, incoming.weeksGenerated)
+    } else {
+      state.value = incoming
+    }
+    persist()
+  }
+
   /** Runs logged before history tracked runs: add them to history once */
   function backfillRuns() {
     for (const e of entries.value) {
@@ -202,6 +239,6 @@ export const useCalendarStore = defineStore('calendar', () => {
   return {
     state, needsSetup, entries, lastDate, streak,
     setup, reset, extend, addEntry, updateEntry, removeEntry, entriesOn, isDone, status,
-    logRun, undoRun, deleteSession,
+    logRun, undoRun, deleteSession, importMode, importCalendar,
   }
 })

@@ -14,16 +14,51 @@ const emit = defineEmits<{
     'skip': []
 }>();
 
+// Wall clock, not a tick count: timers are suspended while the phone is locked,
+// so the countdown has to catch up from the real time when the app wakes.
+const endAt = Date.now() + props.seconds * 1000;
 const remaining = ref(props.seconds);
-const interval = setInterval(() => {
-    remaining.value--;
+let finished = false;
+
+function tick() {
+    if (finished) return;
+    remaining.value = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
     if (remaining.value <= 0) {
+        finished = true;
         clearInterval(interval);
         emit('done');
     }
-}, 1000);
+}
+const interval = setInterval(tick, 250);
 
-onUnmounted(() => clearInterval(interval));
+// ---- keep the screen on while counting down ----
+let wakeLock: WakeLockSentinel | undefined;
+let unmounted = false;
+async function requestWakeLock() {
+    try {
+        const lock = await navigator.wakeLock?.request('screen');
+        // The timer may have closed while the request was pending
+        if (unmounted) lock?.release().catch(() => { });
+        else wakeLock = lock;
+    } catch {
+        // not supported / denied: timer still works
+    }
+}
+function onVisibility() {
+    if (document.visibilityState !== 'visible') return;
+    tick();
+    // The browser drops the lock when the app is hidden
+    if (!finished) requestWakeLock();
+}
+document.addEventListener('visibilitychange', onVisibility);
+requestWakeLock();
+
+onUnmounted(() => {
+    unmounted = true;
+    clearInterval(interval);
+    document.removeEventListener('visibilitychange', onVisibility);
+    wakeLock?.release().catch(() => { });
+});
 </script>
 
 <template>
