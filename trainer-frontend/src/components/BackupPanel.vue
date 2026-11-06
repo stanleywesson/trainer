@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useCalendarStore } from '@/stores/calendar'
 import { useHistoryStore } from '@/stores/history'
 import { BackupError, createBackup, lastBackupAt, markBackedUp, parseBackup, saveBackup, type BackupFile } from '@/utils/backup'
 
 const STALE_AFTER_DAYS = 7
+const NOTICE_MS = 5000
+const ERROR_NOTICE_MS = 10000
 
-defineProps<{
-    /** Fresh install: only offer to restore */
+const props = defineProps<{
+    /** Fresh install: a card that only offers to restore. Otherwise a compact icon with a menu. */
     restoreOnly?: boolean
 }>()
 
@@ -17,11 +19,22 @@ const emit = defineEmits<{ restored: [] }>()
 const history = useHistoryStore()
 const calendar = useCalendarStore()
 
+const menuOpen = ref(false)
 const lastBackup = ref(lastBackupAt())
 const notice = ref<{ text: string, error?: boolean } | null>(null)
 const fileInput = ref<HTMLInputElement>()
 const preview = ref<{ backup: BackupFile, added: number, existing: number } | null>(null)
 const replaceCalendar = ref(false)
+
+let noticeTimer: ReturnType<typeof setTimeout> | undefined
+
+/** The card shows notices inline; the compact menu has no room, so they appear briefly as a toast */
+function showNotice(text: string, error = false) {
+    clearTimeout(noticeTimer)
+    notice.value = { text, error }
+    if (!props.restoreOnly) noticeTimer = setTimeout(() => { notice.value = null }, error ? ERROR_NOTICE_MS : NOTICE_MS)
+}
+onUnmounted(() => clearTimeout(noticeTimer))
 
 const daysSinceBackup = computed(() => lastBackup.value === null
     ? null
@@ -57,16 +70,22 @@ const previewMessage = computed(() => {
 })
 
 async function backUp() {
+    menuOpen.value = false
     notice.value = null
     try {
         const result = await saveBackup(createBackup(history.workouts, calendar.state))
         if (result === 'cancelled') return
         markBackedUp()
         lastBackup.value = lastBackupAt()
-        notice.value = { text: result === 'shared' ? 'Backup shared.' : 'Backup downloaded.' }
+        showNotice(result === 'shared' ? 'Backup shared.' : 'Backup downloaded.')
     } catch {
-        notice.value = { text: "Couldn't create the backup. Please try again.", error: true }
+        showNotice("Couldn't create the backup. Please try again.", true)
     }
+}
+
+function chooseFile() {
+    menuOpen.value = false
+    fileInput.value?.click()
 }
 
 async function fileChosen(event: Event) {
@@ -81,7 +100,7 @@ async function fileChosen(event: Event) {
         replaceCalendar.value = false
         preview.value = { backup, added, existing: backup.history.length - added }
     } catch (e) {
-        notice.value = { text: e instanceof BackupError ? e.message : "Couldn't read that file.", error: true }
+        showNotice(e instanceof BackupError ? e.message : "Couldn't read that file.", true)
     }
 }
 
@@ -97,44 +116,65 @@ function restore() {
             markBackedUp(p.backup.exportedAt)
             lastBackup.value = lastBackupAt()
         }
-        notice.value = { text: `Restored ${p.added} session${p.added === 1 ? '' : 's'}.` }
+        showNotice(`Restored ${p.added} session${p.added === 1 ? '' : 's'}.`)
         emit('restored')
     } catch {
-        notice.value = { text: "Couldn't save the restored data. The phone's storage may be full.", error: true }
+        showNotice("Couldn't save the restored data. The phone's storage may be full.", true)
     }
 }
 </script>
 
 <template>
-    <div class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-3">
-        <div v-if="restoreOnly">
+    <!-- First-run card -->
+    <div v-if="restoreOnly" class="bg-gray-800 rounded-2xl p-4 flex flex-col gap-3">
+        <div>
             <p class="text-white font-semibold">Already have a backup?</p>
             <p class="text-sm text-gray-400">Restore your history and calendar from a backup file.</p>
         </div>
-        <p v-else :class="['text-sm font-semibold', overdue ? 'text-amber-400' : 'text-gray-400']">{{ status }}</p>
-
-        <div class="flex gap-2">
-            <button v-if="!restoreOnly" @click="backUp"
-                class="flex-1 min-h-11 rounded-xl bg-indigo-600 text-white font-semibold active:scale-95 transition-transform">
-                Back up
-            </button>
-            <button @click="fileInput?.click()"
-                class="flex-1 min-h-11 rounded-xl border border-gray-600 text-gray-200 font-semibold active:scale-95 transition-transform">
-                Restore
-            </button>
-        </div>
-        <input ref="fileInput" type="file" accept=".json,.txt,application/json,text/plain" class="hidden"
-            @change="fileChosen" />
-
+        <button @click="chooseFile"
+            class="min-h-11 rounded-xl border border-gray-600 text-gray-200 font-semibold active:scale-95 transition-transform">
+            Restore
+        </button>
         <p v-if="notice" :class="['text-sm', notice.error ? 'text-red-400' : 'text-emerald-400']">{{ notice.text }}</p>
-
-        <ConfirmDialog v-if="preview" title="Restore this backup?" :message="previewMessage" confirm-label="Restore"
-            @confirm="restore" @cancel="preview = null">
-            <p v-if="calendarNote" class="text-sm text-gray-400">{{ calendarNote }}</p>
-            <label v-if="calendarMode === 'different'" class="flex items-start gap-3 text-sm text-gray-200">
-                <input v-model="replaceCalendar" type="checkbox" class="mt-0.5 size-5 shrink-0" />
-                <span>Replace this calendar with the backup's. Otherwise this one is kept.</span>
-            </label>
-        </ConfirmDialog>
     </div>
+
+    <!-- Compact icon + menu -->
+    <div v-else class="relative shrink-0">
+        <button @click="menuOpen = !menuOpen" aria-label="Backup and restore" :aria-expanded="menuOpen"
+            class="relative size-11 rounded-full bg-gray-800 text-gray-200 flex items-center justify-center active:scale-95 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75"
+                stroke="currentColor" class="size-6" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
+            </svg>
+            <span v-if="overdue" data-testid="backup-overdue"
+                class="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-amber-400 ring-2 ring-gray-800"></span>
+        </button>
+
+        <template v-if="menuOpen">
+            <div class="fixed inset-0 z-30" @click="menuOpen = false"></div>
+            <div class="absolute right-0 top-full mt-2 z-40 w-56 bg-gray-800 border border-gray-700 rounded-2xl p-2 shadow-xl flex flex-col">
+                <p :class="['text-xs font-semibold px-3 py-2', overdue ? 'text-amber-400' : 'text-gray-400']">{{ status }}</p>
+                <button @click="backUp"
+                    class="min-h-11 px-3 rounded-xl text-left text-white font-semibold active:bg-gray-700">Back up</button>
+                <button @click="chooseFile"
+                    class="min-h-11 px-3 rounded-xl text-left text-white font-semibold active:bg-gray-700">Restore</button>
+            </div>
+        </template>
+
+        <p v-if="notice" @click="notice = null" role="status" :class="['fixed inset-x-4 z-50 bottom-[calc(1rem+env(safe-area-inset-bottom))] rounded-xl px-4 py-3 text-sm font-semibold shadow-xl bg-gray-800 border',
+            notice.error ? 'text-red-400 border-red-500/40' : 'text-emerald-400 border-emerald-500/40']">{{ notice.text }}</p>
+    </div>
+
+    <input ref="fileInput" type="file" accept=".json,.txt,application/json,text/plain" class="hidden"
+        @change="fileChosen" />
+
+    <ConfirmDialog v-if="preview" title="Restore this backup?" :message="previewMessage" confirm-label="Restore"
+        @confirm="restore" @cancel="preview = null">
+        <p v-if="calendarNote" class="text-sm text-gray-400">{{ calendarNote }}</p>
+        <label v-if="calendarMode === 'different'" class="flex items-start gap-3 text-sm text-gray-200">
+            <input v-model="replaceCalendar" type="checkbox" class="mt-0.5 size-5 shrink-0" />
+            <span>Replace this calendar with the backup's. Otherwise this one is kept.</span>
+        </label>
+    </ConfirmDialog>
 </template>
