@@ -834,7 +834,7 @@
         "restSeconds": 75
       },
       {
-        "exerciseId": "g-hip-thrust",
+        "exerciseId": "lg8",
         "sets": 3,
         "reps": 12,
         "restSeconds": 75
@@ -919,10 +919,10 @@
         "restSeconds": 90
       },
       {
-        "exerciseId": "g-leg-extension",
+        "exerciseId": "g-step-up",
         "sets": 3,
-        "reps": 12,
-        "restSeconds": 60
+        "reps": 10,
+        "restSeconds": 75
       },
       {
         "exerciseId": "g-leg-curl",
