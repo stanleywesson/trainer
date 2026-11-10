@@ -113,7 +113,37 @@ function finishEarly() {
     router.push({ name: 'workoutDetail', params: { id: route.params.id } });
 }
 
+/** Exercises in the current block with some, but not all, sets ticked */
+const unticked = ref<{ exIdx: number, from: number, total: number }[]>([]);
+
+function untickedLabel(u: { exIdx: number, from: number, total: number }) {
+    const sets = u.from === u.total ? `Set ${u.from}` : `Sets ${u.from}–${u.total}`;
+    return `${sets} of ${u.total} · ${planned[u.exIdx]!.name}`;
+}
+
 function next(skipped = false) {
+    if (!skipped) {
+        const partial = blockIndices.value
+            .filter(i => completed.value[i]! > 0 && completed.value[i]! < specs[i]!.length)
+            .map(i => ({ exIdx: i, from: completed.value[i]! + 1, total: specs[i]!.length }));
+        if (partial.length) {
+            unticked.value = partial;
+            return;
+        }
+    }
+    advance(skipped);
+}
+
+/** Answer to the "sets not marked done" prompt */
+function resolveUnticked(markDone: boolean) {
+    if (markDone) {
+        for (const u of unticked.value) completed.value[u.exIdx] = specs[u.exIdx]!.length;
+    }
+    unticked.value = [];
+    advance(false);
+}
+
+function advance(skipped: boolean) {
     if (!skipped) {
         completedCount.value += blockIndices.value.length;
         // "Next" without ticking any set circles = did the exercise as planned: log all its sets
@@ -221,6 +251,28 @@ function supersetTag(position: number) {
             class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center px-safe pt-safe pb-safe z-30">
             <RestTimer :key="`timed-${timed.exIdx}-${timed.setIdx}`" :seconds="timed.seconds" label="Go"
                 skip-label="Done early" :detail="timed.name" @done="finishTimed" @skip="finishTimed" />
+        </div>
+
+        <!-- Sets not ticked: forgot to tap, or really stopped early? -->
+        <div v-if="unticked.length" class="fixed inset-0 z-40 bg-black/60 flex items-end" @click.self="unticked = []">
+            <div class="w-full bg-gray-800 rounded-t-3xl px-safe pt-5 pb-safe flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-lg font-bold text-white">Not all sets are marked done</h2>
+                    <p v-for="u in unticked" :key="u.exIdx" class="text-sm text-gray-300">{{ untickedLabel(u) }}</p>
+                    <p class="text-sm text-gray-400 mt-1">Did you do them? Sets left out won't be saved in history.</p>
+                </div>
+                <button @click="resolveUnticked(true)"
+                    class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg active:scale-95 transition-transform">
+                    Yes, mark done</button>
+                <div class="flex gap-3">
+                    <button @click="unticked = []"
+                        class="px-6 py-3 rounded-2xl border border-gray-600 text-gray-200 font-semibold active:scale-95 transition-transform">
+                        Back</button>
+                    <button @click="resolveUnticked(false)"
+                        class="flex-1 py-3 rounded-2xl border border-gray-600 text-gray-200 font-semibold active:scale-95 transition-transform">
+                        No, leave them out</button>
+                </div>
+            </div>
         </div>
 
         <!-- Navigation -->
