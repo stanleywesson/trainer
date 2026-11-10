@@ -51,7 +51,51 @@ function prefillWeights(p: PlannedExercise, sets: SetSpec[]): (number | null)[] 
 }
 
 function setWeight(exIdx: number, setIdx: number, value: number | null) {
-    weights.value[exIdx]![setIdx] = value;
+    const row = weights.value[exIdx]!;
+    const old = row[setIdx];
+    row[setIdx] = value;
+    // Changing the active set carries over to the upcoming sets of the same kind that were on the same weight
+    if (setIdx !== completed.value[exIdx]) return;
+    const kind = specs[exIdx]![setIdx]!.kind;
+    for (let j = setIdx + 1; j < row.length; j++) {
+        if (specs[exIdx]![j]!.kind === kind && row[j] === old) row[j] = value;
+    }
+}
+
+/** The exercise whose set is up next in this block (supersets alternate), or null when every set is done */
+const upNext = computed(() => {
+    let best: number | null = null;
+    for (const i of blockIndices.value) {
+        if (completed.value[i]! >= specs[i]!.length) continue;
+        if (best === null || completed.value[i]! < completed.value[best]!) best = i;
+    }
+    return best;
+});
+
+const anySetDone = computed(() => blockIndices.value.some(i => completed.value[i]! > 0));
+
+const primaryLabel = computed(() => {
+    const i = upNext.value;
+    if (i === null) return isLastBlock.value ? 'Finish' : isSuperset.value ? 'Next' : 'Next Exercise';
+    const setIdx = completed.value[i]!;
+    const tag = isSuperset.value ? `${supersetTag(blockIndices.value.indexOf(i))} ` : '';
+    const verb = specs[i]![setIdx]!.duration ? '▶ Start' : '✓ Done';
+    return `${verb} · ${tag}set ${setIdx + 1} of ${specs[i]!.length}`;
+});
+
+function primary() {
+    const i = upNext.value;
+    if (i === null) next(false);
+    else completeSet(i, completed.value[i]!);
+}
+
+const secondaryLabel = computed(() => {
+    if (!anySetDone.value) return isLastBlock.value ? 'Skip & Finish' : isSuperset.value ? 'Skip this superset' : 'Skip this exercise';
+    return isLastBlock.value ? 'Finish now' : 'Move on to the next exercise';
+});
+
+function secondary() {
+    next(!anySetDone.value);
 }
 
 function setReps(exIdx: number, setIdx: number, value: number | null) {
@@ -113,7 +157,7 @@ function finishEarly() {
     router.push({ name: 'workoutDetail', params: { id: route.params.id } });
 }
 
-/** Exercises in the current block with some, but not all, sets ticked */
+/** Exercises in the current block with sets not marked done */
 const unticked = ref<{ exIdx: number, from: number, total: number }[]>([]);
 
 function untickedLabel(u: { exIdx: number, from: number, total: number }) {
@@ -124,7 +168,7 @@ function untickedLabel(u: { exIdx: number, from: number, total: number }) {
 function next(skipped = false) {
     if (!skipped) {
         const partial = blockIndices.value
-            .filter(i => completed.value[i]! > 0 && completed.value[i]! < specs[i]!.length)
+            .filter(i => completed.value[i]! < specs[i]!.length)
             .map(i => ({ exIdx: i, from: completed.value[i]! + 1, total: specs[i]!.length }));
         if (partial.length) {
             unticked.value = partial;
@@ -145,11 +189,7 @@ function resolveUnticked(markDone: boolean) {
 
 function advance(skipped: boolean) {
     if (!skipped) {
-        completedCount.value += blockIndices.value.length;
-        // "Next" without ticking any set circles = did the exercise as planned: log all its sets
-        for (const i of blockIndices.value) {
-            if (completed.value[i] === 0) completed.value[i] = specs[i]!.length;
-        }
+        completedCount.value += blockIndices.value.filter(i => completed.value[i]! > 0).length;
     }
 
     if (isLastBlock.value) {
@@ -221,9 +261,10 @@ function supersetTag(position: number) {
                 <WatchLink :exercise="planned[exIdx]!" />
 
                 <SetTracker :sets="specs[exIdx]!" :completed="completed[exIdx]!"
-                    :weighted="!!planned[exIdx]!.weighted" :weights="weights[exIdx]!" :reps="repsDone[exIdx]!" class="mt-1"
-                    @complete="completeSet(exIdx, $event)" @weight="(s, v) => setWeight(exIdx, s, v)"
-                    @reps="(s, v) => setReps(exIdx, s, v)" />
+                    :weighted="!!planned[exIdx]!.weighted" :distance="planned[exIdx]!.repType === 'distance'"
+                    :up="!isSuperset || upNext === exIdx"
+                    :weights="weights[exIdx]!" :reps="repsDone[exIdx]!" class="mt-1"
+                    @weight="(s, v) => setWeight(exIdx, s, v)" @reps="(s, v) => setReps(exIdx, s, v)" />
 
                 <div class="text-sm text-gray-400 flex flex-col gap-1">
                     <span><span class="text-gray-500">Tempo: </span>{{ planned[exIdx]!.tempo }}</span>
@@ -277,12 +318,13 @@ function supersetTag(position: number) {
 
         <!-- Navigation -->
         <footer class="sticky bottom-0 z-20 bg-gray-900/95 backdrop-blur border-t border-gray-800 px-safe pt-3 pb-safe">
-            <button @click="next(false)"
-                class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg active:scale-95 transition-transform">{{
-                    isLastBlock ? 'Finish' : isSuperset ? 'Next' : 'Next Exercise' }}</button>
-            <button @click="next(true)"
+            <!-- One big button that always does the next thing: log the set that's up, then move on -->
+            <button @click="primary"
+                :class="['w-full py-4 rounded-2xl text-white font-bold text-lg active:scale-95 transition-transform',
+                    upNext === null ? 'bg-emerald-600' : 'bg-indigo-600']">{{ primaryLabel }}</button>
+            <button @click="secondary"
                 class="w-full py-3 mt-2 rounded-2xl border border-gray-700 text-gray-200 text-sm font-semibold active:scale-95 transition-transform">{{
-                    isLastBlock ? 'Skip & Finish' : isSuperset ? 'Skip this superset' : 'Skip this exercise' }}</button>
+                    secondaryLabel }}</button>
         </footer>
     </div>
 </template>
