@@ -430,11 +430,18 @@
     "name": "Back & Abs",
     "category": "Back & Abs",
     "difficulty": 4,
-    "estimatedMinutes": 60,
+    "estimatedMinutes": 65,
     "recommendation": "Heavy barbell row early while fresh, then single-arm and cable rows. Face pulls keep the shoulders balanced. Pairs well 2–3 days after Back & Shoulders.",
     "format": "sets",
     "location": "gym",
     "exercises": [
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
       {
         "exerciseId": "g-lat-pulldown",
         "warmupSets": 1,
@@ -475,10 +482,10 @@
         "restSeconds": 60
       },
       {
-        "exerciseId": "co20",
+        "exerciseId": "co23",
         "sets": 3,
         "reps": 10,
-        "restSeconds": 60
+        "restSeconds": 45
       },
       {
         "exerciseId": "co1",
@@ -494,11 +501,18 @@
     "name": "Chest & Abs",
     "category": "Chest & Abs",
     "difficulty": 4,
-    "estimatedMinutes": 60,
+    "estimatedMinutes": 65,
     "recommendation": "Presses first while fresh, flies after at moderate weight for a deep stretch. Push-ups to failure finish the chest.",
     "format": "sets",
     "location": "gym",
     "exercises": [
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
       {
         "exerciseId": "g-bench",
         "warmupSets": 1,
@@ -541,8 +555,8 @@
       },
       {
         "exerciseId": "g-crunch",
-        "sets": 4,
-        "reps": 25,
+        "sets": 3,
+        "reps": 15,
         "restSeconds": 45
       }
     ]
@@ -552,7 +566,7 @@
     "name": "Back & Shoulders",
     "category": "Back & Shoulders",
     "difficulty": 4,
-    "estimatedMinutes": 60,
+    "estimatedMinutes": 65,
     "recommendation": "Pump-style session: supersets, short rests and one drop set per muscle. Rear delts replace front raises for healthier shoulders.",
     "format": "sets",
     "location": "gym",
@@ -617,6 +631,12 @@
         "reps": 15,
         "superset": "B",
         "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-pallof-press",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 45
       }
     ]
   },
@@ -625,7 +645,7 @@
     "name": "Leg Day 1",
     "category": "Lower Body",
     "difficulty": 4,
-    "estimatedMinutes": 60,
+    "estimatedMinutes": 65,
     "recommendation": "Heavy squat and hinge day. Take the full rest on squats and RDLs; quality reps beat short rests here.",
     "format": "sets",
     "location": "gym",
@@ -691,6 +711,13 @@
         "reps": 20,
         "superset": "B",
         "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-suitcase-carry",
+        "sets": 2,
+        "reps": 0,
+        "duration": 30,
+        "restSeconds": 60
       }
     ]
   },
@@ -699,11 +726,18 @@
     "name": "Leg Day 2",
     "category": "Lower Body",
     "difficulty": 3,
-    "estimatedMinutes": 40,
+    "estimatedMinutes": 50,
     "recommendation": "Machine-based quad pump plus hip thrusts for glutes, since Leg Day 1 already has heavy RDLs.",
     "format": "sets",
     "location": "gym",
     "exercises": [
+      {
+        "exerciseId": "g-walk",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
       {
         "exerciseId": "g-leg-press",
         "sets": 4,
@@ -745,6 +779,13 @@
         "reps": 0,
         "max": true,
         "restSeconds": 40
+      },
+      {
+        "exerciseId": "co25",
+        "sets": 2,
+        "reps": 0,
+        "duration": 30,
+        "restSeconds": 30
       }
     ]
   },
@@ -790,10 +831,9 @@
         "restSeconds": 60
       },
       {
-        "exerciseId": "co1",
+        "exerciseId": "co23",
         "sets": 3,
-        "reps": 0,
-        "duration": 30,
+        "reps": 8,
         "restSeconds": 45
       }
     ]
@@ -842,7 +882,7 @@
       {
         "exerciseId": "g-crunch",
         "sets": 3,
-        "reps": 15,
+        "reps": 12,
         "restSeconds": 45
       }
     ]
@@ -852,11 +892,18 @@
     "name": "Gym Upper",
     "category": "Upper Body",
     "difficulty": 2,
-    "estimatedMinutes": 40,
+    "estimatedMinutes": 50,
     "recommendation": "Step up from the starters: push, pull and shoulders. Alternate with Gym Lower.",
     "format": "sets",
     "location": "gym",
     "exercises": [
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
       {
         "exerciseId": "g-db-bench",
         "sets": 3,
@@ -886,6 +933,18 @@
         "sets": 3,
         "reps": 15,
         "restSeconds": 45
+      },
+      {
+        "exerciseId": "g-pallof-press",
+        "sets": 2,
+        "reps": 10,
+        "restSeconds": 45
+      },
+      {
+        "exerciseId": "co23",
+        "sets": 2,
+        "reps": 8,
+        "restSeconds": 45
       }
     ]
   },
@@ -894,7 +953,7 @@
     "name": "Gym Lower",
     "category": "Lower Body",
     "difficulty": 2,
-    "estimatedMinutes": 40,
+    "estimatedMinutes": 45,
     "recommendation": "Step up from the starters: quads, hamstrings, glutes and calves. Keep the RDL light and focus on the hip hinge.",
     "format": "sets",
     "location": "gym",
@@ -935,6 +994,19 @@
         "sets": 3,
         "reps": 15,
         "restSeconds": 45
+      },
+      {
+        "exerciseId": "co24",
+        "sets": 2,
+        "reps": 8,
+        "restSeconds": 30
+      },
+      {
+        "exerciseId": "co25",
+        "sets": 2,
+        "reps": 0,
+        "duration": 20,
+        "restSeconds": 30
       }
     ]
   },

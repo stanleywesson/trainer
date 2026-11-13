@@ -124,15 +124,17 @@ export interface PlannedExercise extends Exercise {
   dropSet?: DropSet
 }
 
-export function planExercises(workout: Workout | undefined): PlannedExercise[] {
+/** `maxSets` caps the working sets of every exercise (ease-in weeks) */
+export function planExercises(workout: Workout | undefined, maxSets?: number): PlannedExercise[] {
   return (workout?.exercises ?? []).map(entry => {
     const ex = getExercise(entry.exerciseId)
     const reps = entry.reps ?? ex.defaultReps
+    const sets = entry.sets ?? ex.defaultSets
     return {
       ...ex,
       repType: entry.max ? 'failure' : ex.repType,
       restSeconds: entry.restSeconds ?? ex.restSeconds,
-      sets: entry.sets ?? ex.defaultSets,
+      sets: maxSets ? Math.min(sets, maxSets) : sets,
       reps,
       repsMax: entry.repsMax,
       duration: entry.duration ?? ex.defaultDuration,
@@ -179,7 +181,8 @@ export function formatSeconds(s: number): string {
 export function buildSets(p: PlannedExercise): SetSpec[] {
   const side = p.perSide ? ' / side' : ''
   const working = (): Omit<SetSpec, 'kind'> => {
-    if (p.repType === 'duration') return { label: `${formatSeconds(p.duration ?? 0)}${side}`, reps: 0, duration: p.duration ?? 0 }
+    // "each side", not "/ side": a timed hold is done in full on both sides, not split between them
+    if (p.repType === 'duration') return { label: `${formatSeconds(p.duration ?? 0)}${p.perSide ? ' each side' : ''}`, reps: 0, duration: p.duration ?? 0 }
     if (p.repType === 'distance') return { label: formatDistance(p.distance ?? 0), reps: 0 }
     if (p.repType === 'failure') return { label: `Max reps${side}`, reps: 0 }
     return { label: `${p.reps}${p.repsMax ? `–${p.repsMax}` : ''} reps${side}`, reps: p.reps }
@@ -205,7 +208,7 @@ export function buildSets(p: PlannedExercise): SetSpec[] {
 
 /** e.g. "1 warm-up + 4 × 8–10", "3 × 8 / side", "3 × 30s", "2 × 15 + drop set" */
 export function prescriptionLabel(p: PlannedExercise): string {
-  const side = p.perSide ? ' / side' : ''
+  const side = p.perSide ? (p.repType === 'duration' ? ' each side' : ' / side') : ''
   let main: string
   if (p.repType === 'duration') main = p.sets === 1 ? formatSeconds(p.duration ?? 0) : `${p.sets} × ${formatSeconds(p.duration ?? 0)}`
   else if (p.repType === 'distance') main = p.sets === 1 ? formatDistance(p.distance ?? 0) : `${p.sets} × ${formatDistance(p.distance ?? 0)}`

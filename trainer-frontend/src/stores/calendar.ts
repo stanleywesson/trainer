@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { WorkoutLocation } from '@/data'
-import { generatePlan, jogLabel, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId } from '@/data/plans'
+import { generatePlan, jogLabel, setCapOn as planSetCapOn, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId } from '@/data/plans'
 import { RUN_WORKOUT_ID, useHistoryStore } from '@/stores/history'
 import { keepUnreadable } from '@/utils/backup'
 import { fromKey, toKey, todayKey } from '@/utils/date'
@@ -85,6 +85,12 @@ export const useCalendarStore = defineStore('calendar', () => {
     if (!e) return
     Object.assign(e, patch)
     persist()
+  }
+
+  /** Max working sets per exercise for a strength session on this date (ease-in weeks), else undefined */
+  function setCapOn(date: string): number | undefined {
+    const s = state.value
+    return s ? planSetCapOn(s.plan, s.startDate, date) : undefined
   }
 
   function removeEntry(id: string) {
@@ -238,7 +244,7 @@ export const useCalendarStore = defineStore('calendar', () => {
 
   return {
     state, needsSetup, entries, lastDate, streak,
-    setup, reset, extend, addEntry, updateEntry, removeEntry, entriesOn, isDone, status,
+    setup, reset, extend, addEntry, updateEntry, removeEntry, entriesOn, isDone, status, setCapOn,
     logRun, undoRun, deleteSession, importMode, importCalendar,
   }
 })

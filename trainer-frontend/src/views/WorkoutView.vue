@@ -6,13 +6,16 @@ import SetTracker from '@/components/SetTracker.vue';
 import RestTimer from '@/components/RestTimer.vue';
 import WatchLink from '@/components/WatchLink.vue';
 import { useHistoryStore, type ExerciseLog } from '@/stores/history';
+import { useCalendarStore } from '@/stores/calendar';
+import { todayKey } from '@/utils/date';
 
 const route = useRoute();
 const router = useRouter();
 const historyStore = useHistoryStore();
 
 const workout = getWorkout(route.params.id);
-const planned = planExercises(workout);
+const sessionDate = typeof route.query.date === 'string' ? route.query.date : todayKey();
+const planned = planExercises(workout, useCalendarStore().setCapOn(sessionDate));
 const specs: SetSpec[][] = planned.map(buildSets);
 /** Blocks of indices into `planned`: one exercise, or a superset group */
 const blocks: number[][] = groupBlocks(planned).map(group => group.map(p => planned.indexOf(p)));
@@ -27,7 +30,10 @@ const completedCount = ref(0);
 
 const showRest = ref(false);
 const restSeconds = ref(0);
-const timed = ref<{ exIdx: number, setIdx: number, seconds: number, name: string } | null>(null);
+/** Per-side holds run as two full timers: side 1 → switch → side 2 */
+type TimedPhase = 'both' | 'side1' | 'switch' | 'side2';
+const timed = ref<{ exIdx: number, setIdx: number, seconds: number, name: string, phase: TimedPhase } | null>(null);
+const SWITCH_SECONDS = 5;
 
 const blockIndices = computed(() => blocks[currentBlock.value] ?? []);
 const isSuperset = computed(() => blockIndices.value.length > 1);
@@ -105,17 +111,28 @@ function setReps(exIdx: number, setIdx: number, value: number | null) {
 function completeSet(exIdx: number, setIdx: number) {
     const spec = specs[exIdx]![setIdx]!;
     if (spec.duration) {
-        timed.value = { exIdx, setIdx, seconds: spec.duration, name: planned[exIdx]!.name };
+        const phase = planned[exIdx]!.perSide ? 'side1' : 'both';
+        timed.value = { exIdx, setIdx, seconds: spec.duration, name: planned[exIdx]!.name, phase };
         return;
     }
     markDone(exIdx);
 }
 
+const timedView = computed(() => {
+    const t = timed.value;
+    if (!t) return null;
+    if (t.phase === 'switch') return { seconds: SWITCH_SECONDS, label: 'Switch sides', skip: 'Start side 2', detail: `${t.name} · side 2 next` };
+    const side = t.phase === 'side1' ? ' · side 1 of 2' : t.phase === 'side2' ? ' · side 2 of 2' : '';
+    return { seconds: t.seconds, label: 'Go', skip: 'Done early', detail: `${t.name}${side}` };
+});
+
 function finishTimed() {
-    if (!timed.value) return;
-    const { exIdx } = timed.value;
+    const t = timed.value;
+    if (!t) return;
+    if (t.phase === 'side1') { t.phase = 'switch'; return; }
+    if (t.phase === 'switch') { t.phase = 'side2'; return; }
     timed.value = null;
-    markDone(exIdx);
+    markDone(t.exIdx);
 }
 
 function markDone(exIdx: number) {
@@ -154,7 +171,7 @@ function buildLog(): ExerciseLog[] {
 }
 
 function finishEarly() {
-    router.push({ name: 'workoutDetail', params: { id: route.params.id } });
+    router.push({ name: 'workoutDetail', params: { id: route.params.id }, query: route.query });
 }
 
 /** Exercises in the current block with sets not marked done */
@@ -288,10 +305,11 @@ function supersetTag(position: number) {
         </div>
 
         <!-- Timed set (holds, lunges, cardio warm-up) -->
-        <div v-if="timed"
+        <div v-if="timed && timedView"
             class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center px-safe pt-safe pb-safe z-30">
-            <RestTimer :key="`timed-${timed.exIdx}-${timed.setIdx}`" :seconds="timed.seconds" label="Go"
-                skip-label="Done early" :detail="timed.name" @done="finishTimed" @skip="finishTimed" />
+            <RestTimer :key="`timed-${timed.exIdx}-${timed.setIdx}-${timed.phase}`" :seconds="timedView.seconds"
+                :label="timedView.label" :skip-label="timedView.skip" :detail="timedView.detail" @done="finishTimed"
+                @skip="finishTimed" />
         </div>
 
         <!-- Sets not ticked: forgot to tap, or really stopped early? -->

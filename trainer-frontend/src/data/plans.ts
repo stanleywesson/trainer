@@ -100,6 +100,25 @@ function buildStrength(week: number, location: WorkoutLocation): string[][] {
 const REBUILD_WEEKS = 8
 export const WEEKS_PER_BLOCK = 12
 
+/** Rebuild hands over to Build gently: for the first Build weeks every exercise is capped at a few working sets */
+const BUILD_INTRO_WEEKS = 2
+const BUILD_INTRO_MAX_SETS = 3
+
+/** Plan week (0-based) a "YYYY-MM-DD" date falls in; week 0 contains startDate */
+export function planWeekOf(startDate: string, date: string): number {
+  const first = mondayOf(new Date(startDate + 'T00:00:00'))
+  const monday = mondayOf(new Date(date + 'T00:00:00'))
+  // round: a week across a DST change isn't exactly 7 × 24 h
+  return Math.round((monday.getTime() - first.getTime()) / (7 * 86_400_000))
+}
+
+/** Working-set cap for strength sessions on a date (the Rebuild → Build ease-in weeks), else undefined */
+export function setCapOn(plan: PlanId, startDate: string, date: string): number | undefined {
+  if (plan !== 'rebuild') return undefined
+  const buildWeek = planWeekOf(startDate, date) - REBUILD_WEEKS
+  return buildWeek >= 0 && buildWeek < BUILD_INTRO_WEEKS ? BUILD_INTRO_MAX_SETS : undefined
+}
+
 /**
  * Generates calendar entries for plan weeks [fromWeek, toWeek).
  * Week 0 is the week containing startDate; days before startDate are skipped.

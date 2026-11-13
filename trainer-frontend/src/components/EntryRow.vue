@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getWorkout } from '@/data'
+import { getWorkout, planExercises } from '@/data'
 import { jogLabel, jogMinutes, type CalendarEntry } from '@/data/plans'
 import { useCalendarStore } from '@/stores/calendar'
 import LogRunDialog from '@/components/LogRunDialog.vue'
@@ -27,7 +27,12 @@ const title = computed(() => {
 
 const subtitle = computed(() => {
     const e = props.entry
-    if (e.type === 'workout') return workout.value ? `${workout.value.estimatedMinutes} min · ${workout.value.category}` : ''
+    if (e.type === 'workout') {
+        if (!workout.value) return ''
+        const cap = calendar.setCapOn(e.date)
+        const eased = cap !== undefined && planExercises(workout.value).some(p => p.sets > cap)
+        return `${workout.value.estimatedMinutes} min · ${workout.value.category}${eased ? ` · ease-in: max ${cap} sets` : ''}`
+    }
     if (e.type === 'jog' && e.jog) {
         return e.done && e.doneMinutes ? `Ran ${e.doneMinutes} min · planned: ${jogLabel(e.jog)}` : jogLabel(e.jog)
     }
@@ -41,7 +46,8 @@ const accent = computed(() => ({
 }[props.entry.type]))
 
 function openWorkout() {
-    if (props.entry.workoutId) router.push({ name: 'workoutDetail', params: { id: props.entry.workoutId } })
+    // the planned date decides ease-in caps, even when previewing a future session
+    if (props.entry.workoutId) router.push({ name: 'workoutDetail', params: { id: props.entry.workoutId }, query: { date: props.entry.date } })
 }
 
 function startTimer() {

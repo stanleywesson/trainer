@@ -3,12 +3,19 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { circuitLabel, getWorkout, planExercises, prescriptionLabel, stationLabel, type PlannedExercise } from '@/data'
 import WatchLink from '@/components/WatchLink.vue'
+import { useCalendarStore } from '@/stores/calendar'
+import { todayKey } from '@/utils/date'
 
 const route = useRoute()
 const router = useRouter()
+const calendar = useCalendarStore()
 
 const workout = computed(() => getWorkout(route.params.id))
-const exercises = computed(() => planExercises(workout.value))
+/** Planned date from the calendar, else today */
+const sessionDate = computed(() => typeof route.query.date === 'string' ? route.query.date : todayKey())
+const setCap = computed(() => calendar.setCapOn(sessionDate.value))
+const eased = computed(() => setCap.value !== undefined && planExercises(workout.value).some(p => p.sets > setCap.value!))
+const exercises = computed(() => planExercises(workout.value, setCap.value))
 const circuit = computed(() => workout.value?.format === 'circuit' ? workout.value.circuit : undefined)
 const rounds = computed(() => workout.value?.format === 'rounds' ? workout.value.rounds ?? 1 : undefined)
 
@@ -32,7 +39,7 @@ function supersetTag(index: number) {
 
 function startWorkout() {
     const name = circuit.value ? 'circuit' : rounds.value ? 'rounds' : 'workout'
-    router.push({ name, params: { id: route.params.id } })
+    router.push({ name, params: { id: route.params.id }, query: { date: sessionDate.value } })
 }
 </script>
 
@@ -89,6 +96,13 @@ function startWorkout() {
         <div class="bg-indigo-950/60 border border-indigo-800/40 rounded-2xl p-4 flex flex-col gap-1">
             <span class="text-xs font-semibold uppercase tracking-widest text-indigo-400">Recommendation</span>
             <p class="text-sm text-gray-300 leading-relaxed">{{ workout.recommendation }}</p>
+        </div>
+
+        <!-- Ease-in weeks -->
+        <div v-if="eased" class="bg-emerald-950/50 border border-emerald-800/40 rounded-2xl p-4 flex flex-col gap-1">
+            <span class="text-xs font-semibold uppercase tracking-widest text-emerald-400">Ease-in week</span>
+            <p class="text-sm text-gray-300 leading-relaxed">Max {{ setCap }} working sets per exercise while you settle
+                into the new program. For lifts you haven't done before, start light and find your working weight.</p>
         </div>
 
         <!-- Exercise list -->
