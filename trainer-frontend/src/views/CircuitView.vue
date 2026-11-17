@@ -103,9 +103,11 @@ function finish() {
     })
 }
 
+/** Finished intervals are always kept: they go to the summary to be saved */
 function finishEarly() {
     stop()
-    router.push({ name: 'workoutDetail', params: { id: route.params.id } })
+    if (completedIntervals.value > 0) finish()
+    else router.push({ name: 'workoutDetail', params: { id: route.params.id } })
 }
 </script>
 

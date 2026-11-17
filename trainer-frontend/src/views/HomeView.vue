@@ -4,6 +4,7 @@ import WorkoutCard from '@/components/WorkoutCard.vue'
 import { workouts as workoutsData, workoutLocation, type WorkoutLocation } from '@/data'
 import { useCalendarStore } from '@/stores/calendar';
 import TodayCard from '@/components/TodayCard.vue'
+import ResumeWorkoutCard from '@/components/ResumeWorkoutCard.vue'
 
 const selectedLocation = ref<WorkoutLocation | null>(null);
 const selectedDuration = ref<number | null>(null);
@@ -76,6 +77,7 @@ function clearFilters() {
 
         <main class="flex-1 px-safe pb-safe pt-3">
 
+        <ResumeWorkoutCard />
         <TodayCard />
 
         <div ref="listTop" class="flex items-center justify-between mb-3 scroll-mt-20">

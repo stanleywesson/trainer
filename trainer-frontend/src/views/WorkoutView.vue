@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { buildSets, getWorkout, groupBlocks, planExercises, prescriptionLabel, type PlannedExercise, type SetSpec } from '@/data'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import SetTracker from '@/components/SetTracker.vue';
 import RestTimer from '@/components/RestTimer.vue';
 import WatchLink from '@/components/WatchLink.vue';
 import { useHistoryStore, type ExerciseLog } from '@/stores/history';
 import { useCalendarStore } from '@/stores/calendar';
 import { todayKey } from '@/utils/date';
+import { clearActiveWorkout, fitsPlan, loadActiveWorkout, saveActiveWorkout } from '@/utils/activeWorkout';
 
 const route = useRoute();
 const router = useRouter();
@@ -17,16 +18,48 @@ const workout = getWorkout(route.params.id);
 const sessionDate = typeof route.query.date === 'string' ? route.query.date : todayKey();
 const planned = planExercises(workout, useCalendarStore().setCapOn(sessionDate));
 const specs: SetSpec[][] = planned.map(buildSets);
-/** Blocks of indices into `planned`: one exercise, or a superset group */
-const blocks: number[][] = groupBlocks(planned).map(group => group.map(p => planned.indexOf(p)));
+/** Same workout and day left unfinished (app reloaded or closed): carry on where it stopped */
+const saved = loadActiveWorkout();
+const resumed = saved && saved.workoutId === route.params.id && saved.sessionDate === sessionDate
+    && fitsPlan(saved, specs.map(s => s.length)) ? saved : null;
 
-const currentBlock = ref(0);
-const completed = ref<number[]>(planned.map(() => 0));
-const weights = ref<(number | null)[][]>(planned.map((p, i) => prefillWeights(p, specs[i]!)));
+/** Blocks of indices into `planned`: one exercise, or a superset group. Reordered when exercises are swapped. */
+const blocks = ref<number[][]>(resumed?.blocks ?? groupBlocks(planned).map(group => group.map(p => planned.indexOf(p))));
+
+const currentBlock = ref(resumed?.currentBlock ?? 0);
+const completed = ref<number[]>(resumed?.completed ?? planned.map(() => 0));
+const weights = ref<(number | null)[][]>(resumed?.weights ?? planned.map((p, i) => prefillWeights(p, specs[i]!)));
 /** Actual reps per set, pre-filled with the target (null for max/timed sets until entered) */
-const repsDone = ref<(number | null)[][]>(specs.map(sets => sets.map(s => (!s.duration && s.reps) ? s.reps : null)));
-const startTime = Date.now();
-const completedCount = ref(0);
+const repsDone = ref<(number | null)[][]>(resumed?.repsDone ?? specs.map(sets => sets.map(s => (!s.duration && s.reps) ? s.reps : null)));
+const startTime = resumed?.startTime ?? Date.now();
+/** Exercises with at least one set done; each counts once, even if left and come back to */
+const completedCount = computed(() => completed.value.filter(c => c > 0).length);
+
+// Save after every change, once there's something worth resuming
+watch([blocks, currentBlock, completed, weights, repsDone], () => {
+    if (!completed.value.some(c => c > 0) && currentBlock.value === 0) return;
+    saveActiveWorkout({
+        workoutId: route.params.id as string, query: route.query, sessionDate, startTime,
+        blocks: blocks.value, currentBlock: currentBlock.value,
+        completed: completed.value, weights: weights.value, repsDone: repsDone.value,
+    });
+}, { deep: true });
+
+/* Machine busy: pull a later exercise forward; the current one becomes up next, its done sets kept */
+const choosingSwap = ref(false);
+const laterBlocks = computed(() => blocks.value.slice(currentBlock.value + 1).map((b, k) => ({
+    position: currentBlock.value + 1 + k,
+    names: b.map(i => planned[i]!.name).join(' + '),
+    started: b.some(i => completed.value[i]! > 0),
+    superset: b.length > 1,
+})));
+
+function doNow(position: number) {
+    const [chosen] = blocks.value.splice(position, 1);
+    if (chosen) blocks.value.splice(currentBlock.value, 0, chosen);
+    choosingSwap.value = false;
+    window.scrollTo({ top: 0 });
+}
 
 const showRest = ref(false);
 const restSeconds = ref(0);
@@ -35,14 +68,14 @@ type TimedPhase = 'both' | 'side1' | 'switch' | 'side2';
 const timed = ref<{ exIdx: number, setIdx: number, seconds: number, name: string, phase: TimedPhase } | null>(null);
 const SWITCH_SECONDS = 5;
 
-const blockIndices = computed(() => blocks[currentBlock.value] ?? []);
+const blockIndices = computed(() => blocks.value[currentBlock.value] ?? []);
 const isSuperset = computed(() => blockIndices.value.length > 1);
 /** Rest after a set (or after a superset round): taken from the block's last exercise */
 const blockRest = computed(() => planned[blockIndices.value[blockIndices.value.length - 1]!]?.restSeconds ?? 0);
-const isLastBlock = computed(() => currentBlock.value >= blocks.length - 1);
+const isLastBlock = computed(() => currentBlock.value >= blocks.value.length - 1);
 const nextBlockNames = computed(() =>
-    (blocks[currentBlock.value + 1] ?? []).map(i => planned[i]!.name).join(' + '));
-const progress = computed(() => blocks.length ? (currentBlock.value + 1) / blocks.length : 0);
+    (blocks.value[currentBlock.value + 1] ?? []).map(i => planned[i]!.name).join(' + '));
+const progress = computed(() => blocks.value.length ? (currentBlock.value + 1) / blocks.value.length : 0);
 
 /** Same set position from last time this exercise was logged, else the workout's target weight */
 function prefillWeights(p: PlannedExercise, sets: SetSpec[]): (number | null)[] {
@@ -150,8 +183,10 @@ function markDone(exIdx: number) {
     }
 }
 
+/** In the order the exercises were done, which differs from the plan after a swap */
 function buildLog(): ExerciseLog[] {
-    return planned.flatMap((p, i) => {
+    return blocks.value.flat().flatMap(i => {
+        const p = planned[i]!;
         const done = completed.value[i]!;
         if (!done) return [];
         return [{
@@ -170,8 +205,24 @@ function buildLog(): ExerciseLog[] {
     });
 }
 
+/** Done sets are always kept: they go to the summary to be saved. Only an untouched workout is left without saving. */
 function finishEarly() {
+    if (completedCount.value > 0) {
+        goToSummary();
+        return;
+    }
+    clearActiveWorkout();
     router.push({ name: 'workoutDetail', params: { id: route.params.id }, query: route.query });
+}
+
+/** The in-progress save stays until the summary saves the session, so closing the app there loses nothing */
+function goToSummary() {
+    historyStore.pendingLog = buildLog();
+    router.push({
+        name: 'summary',
+        params: { id: route.params.id },
+        query: { startTime, completed: completedCount.value },
+    });
 }
 
 /** Exercises in the current block with sets not marked done */
@@ -192,7 +243,7 @@ function next(skipped = false) {
             return;
         }
     }
-    advance(skipped);
+    advance();
 }
 
 /** Answer to the "sets not marked done" prompt */
@@ -201,21 +252,12 @@ function resolveUnticked(markDone: boolean) {
         for (const u of unticked.value) completed.value[u.exIdx] = specs[u.exIdx]!.length;
     }
     unticked.value = [];
-    advance(false);
+    advance();
 }
 
-function advance(skipped: boolean) {
-    if (!skipped) {
-        completedCount.value += blockIndices.value.filter(i => completed.value[i]! > 0).length;
-    }
-
+function advance() {
     if (isLastBlock.value) {
-        historyStore.pendingLog = buildLog();
-        router.push({
-            name: 'summary',
-            params: { id: route.params.id },
-            query: { startTime, completed: completedCount.value },
-        });
+        goToSummary();
     } else {
         currentBlock.value++;
         window.scrollTo({ top: 0 });
@@ -249,6 +291,8 @@ function supersetTag(position: number) {
                     <div class="bg-indigo-500 h-2 rounded-full transition-all" :style="{ width: `${progress * 100}%` }">
                     </div>
                 </div>
+                <button v-if="laterBlocks.length" @click="choosingSwap = true"
+                    class="self-end min-h-11 -mb-2 text-sm font-semibold text-indigo-300">Machine busy? Do another ›</button>
             </div>
 
             <!-- Superset instructions -->
@@ -296,6 +340,26 @@ function supersetTag(position: number) {
                 <span class="text-white font-semibold">{{ nextBlockNames }}</span>
             </div>
         </main>
+
+        <!-- Machine busy: pick a later exercise to do now -->
+        <div v-if="choosingSwap" class="fixed inset-0 z-40 bg-black/60 flex items-end" @click.self="choosingSwap = false">
+            <div class="w-full max-h-[80vh] overflow-y-auto bg-gray-800 rounded-t-3xl px-safe pt-5 pb-safe flex flex-col gap-3">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-lg font-bold text-white">Do another exercise now</h2>
+                    <p class="text-sm text-gray-400">{{ blockIndices.map(i => planned[i]!.name).join(' + ') }} moves to up next{{
+                        anySetDone ? ', keeping the sets you\'ve done' : '' }}.</p>
+                </div>
+                <button v-for="b in laterBlocks" :key="b.position" @click="doNow(b.position)"
+                    class="flex items-center gap-3 px-4 min-h-14 rounded-2xl bg-gray-900/60 border border-gray-700 text-left active:scale-95 transition-transform">
+                    <span class="flex-1 text-white font-semibold">{{ b.names }}</span>
+                    <span v-if="b.superset" class="text-xs font-bold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-200">Superset</span>
+                    <span v-if="b.started" class="text-xs text-gray-400">started</span>
+                </button>
+                <button @click="choosingSwap = false"
+                    class="w-full py-3 rounded-2xl border border-gray-600 text-gray-200 font-semibold active:scale-95 transition-transform">
+                    Cancel</button>
+            </div>
+        </div>
 
         <!-- Rest timer -->
         <div v-if="showRest"

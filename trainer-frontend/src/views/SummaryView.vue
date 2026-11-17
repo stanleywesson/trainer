@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { getWorkout } from '@/data'
 import DifficultyRating from '@/components/DifficultyRating.vue'
 import { useHistoryStore } from '@/stores/history';
+import { clearActiveWorkout } from '@/utils/activeWorkout';
 
 const route = useRoute();
 const router = useRouter();
@@ -33,6 +34,7 @@ function saveAndFinish() {
         ...(historyStore.pendingLog.length ? { log: historyStore.pendingLog } : {}),
     })
     historyStore.pendingLog = []
+    clearActiveWorkout();
     router.push('/');
 }
 </script>
