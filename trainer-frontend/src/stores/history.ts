@@ -40,9 +40,16 @@ export interface WorkoutSession {
     distanceKm?: number
     /** For runs: what the plan asked for, e.g. "Run 2 min / walk 1 min × 6" */
     plannedRun?: string
+    /** When the logged sets were last corrected after the session */
+    editedAt?: string
+    /** The sets as first saved, kept so edits can be seen and undone */
+    originalLog?: ExerciseLog[]
 }
 
 export const RUN_WORKOUT_ID = 'run'
+
+/** Sessions can be corrected for this long after they end, so old history stays trustworthy */
+export const EDIT_WINDOW_DAYS = 7
 
 const STORAGE_KEY = 'trainer_history'
 
@@ -116,6 +123,32 @@ export const useHistoryStore = defineStore("history", () => {
         persist();
     }
 
+    /** Workouts with logged sets, within EDIT_WINDOW_DAYS of when they ended */
+    function canEdit(session: WorkoutSession, now = Date.now()): boolean {
+        if (session.kind === 'run' || !session.log?.length) return false;
+        return now - Date.parse(session.date) < EDIT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    }
+
+    /** Replaces a session's logged sets; the first edit keeps the sets as originally saved */
+    function updateLog(id: string, log: ExerciseLog[]) {
+        const session = getById(id);
+        if (!session || !canEdit(session)) return;
+        if (!session.originalLog) session.originalLog = JSON.parse(JSON.stringify(session.log ?? []));
+        session.log = log;
+        session.editedAt = new Date().toISOString();
+        persist();
+    }
+
+    /** Puts back the sets as first saved */
+    function revertLog(id: string) {
+        const session = getById(id);
+        if (!session?.originalLog) return;
+        session.log = session.originalLog;
+        delete session.originalLog;
+        delete session.editedAt;
+        persist();
+    }
+
     function runFor(calendarEntryId: string): WorkoutSession | undefined {
         return workouts.value.find(w => w.kind === 'run' && w.calendarEntryId === calendarEntryId);
     }
@@ -160,6 +193,9 @@ export const useHistoryStore = defineStore("history", () => {
         lastLog,
         saveWorkout,
         removeWorkout,
+        canEdit,
+        updateLog,
+        revertLog,
         newSessions,
         importSessions,
         runFor,
