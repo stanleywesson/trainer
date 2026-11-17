@@ -291,8 +291,6 @@ function supersetTag(position: number) {
                     <div class="bg-indigo-500 h-2 rounded-full transition-all" :style="{ width: `${progress * 100}%` }">
                     </div>
                 </div>
-                <button v-if="laterBlocks.length" @click="choosingSwap = true"
-                    class="self-end min-h-11 -mb-2 text-sm font-semibold text-indigo-300">Machine busy? Do another ›</button>
             </div>
 
             <!-- Superset instructions -->
@@ -332,6 +330,9 @@ function supersetTag(position: number) {
                     <span><span class="text-gray-500">Equipment: </span>{{ planned[exIdx]!.equipment }}</span>
                     <span><span class="text-gray-500">Progression: </span>{{ planned[exIdx]!.progressionPath }}</span>
                 </div>
+                <!-- Once per block: on the last card of a superset -->
+                <button v-if="laterBlocks.length && position === blockIndices.length - 1" @click="choosingSwap = true"
+                    class="self-end min-h-11 -mb-2 text-sm font-semibold text-indigo-300">Machine busy? Do another ›</button>
             </div>
 
             <!-- Next preview -->
