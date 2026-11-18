@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { workouts, workoutLocation } from '@/data'
 import { useCalendarStore } from '@/stores/calendar'
-import { addDays, formatDayLong, fromKey, mondayOf, toKey, todayKey } from '@/utils/date'
+import { addDays, formatDayLong, mondayOf, toKey, todayKey } from '@/utils/date'
 import EntryRow from '@/components/EntryRow.vue'
 
 const router = useRouter()
