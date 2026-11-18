@@ -431,7 +431,7 @@
     "category": "Back & Abs",
     "difficulty": 4,
     "estimatedMinutes": 65,
-    "recommendation": "Heavy barbell row early while fresh, then single-arm and cable rows. Face pulls keep the shoulders balanced. Pairs well 2–3 days after Back & Shoulders.",
+    "recommendation": "Pulldowns and heavy barbell rows early while fresh, then single-arm rows. Face pulls keep the shoulders balanced. Pairs well 2–3 days after Back & Shoulders.",
     "format": "sets",
     "location": "gym",
     "exercises": [
@@ -464,12 +464,6 @@
         "restSeconds": 75
       },
       {
-        "exerciseId": "g-cable-row",
-        "sets": 3,
-        "reps": 10,
-        "restSeconds": 75
-      },
-      {
         "exerciseId": "g-face-pull",
         "sets": 3,
         "reps": 15,
@@ -477,7 +471,7 @@
       },
       {
         "exerciseId": "g-shrug",
-        "sets": 4,
+        "sets": 3,
         "reps": 15,
         "restSeconds": 60
       },
@@ -488,11 +482,24 @@
         "restSeconds": 45
       },
       {
-        "exerciseId": "co1",
+        "exerciseId": "g-pallof-press",
         "sets": 3,
-        "reps": 0,
-        "duration": 45,
+        "reps": 10,
         "restSeconds": 45
+      },
+      {
+        "exerciseId": "g-crunch",
+        "sets": 2,
+        "reps": 12,
+        "repsMax": 15,
+        "restSeconds": 45
+      },
+      {
+        "exerciseId": "co25",
+        "sets": 2,
+        "reps": 0,
+        "duration": 30,
+        "restSeconds": 30
       }
     ]
   },
