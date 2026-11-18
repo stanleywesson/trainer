@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { workouts, workoutLocation } from '@/data'
+import { getWorkout, isCardio, workouts, workoutLocation } from '@/data'
 import { useCalendarStore } from '@/stores/calendar'
 import { addDays, formatDayLong, mondayOf, toKey, todayKey } from '@/utils/date'
 import EntryRow from '@/components/EntryRow.vue'
 
-const router = useRouter()
 const calendar = useCalendarStore()
 
 const selected = ref(todayKey())
@@ -40,7 +38,7 @@ function dots(key: string) {
         const s = calendar.status(e)
         if (s === 'missed') return 'bg-red-400'
         if (e.type === 'rest') return 'bg-gray-500'
-        const base = e.type === 'workout' ? 'bg-indigo-400' : 'bg-emerald-400'
+        const base = e.type === 'jog' ? 'bg-emerald-400' : isCardio(getWorkout(e.workoutId)) ? 'bg-amber-400' : 'bg-indigo-400'
         return s === 'done' ? `${base} ring-2 ring-white/70` : base
     })
 }
@@ -78,30 +76,14 @@ const showExtend = computed(() => {
     return calendar.state?.plan !== 'custom' && !!last && last <= toKey(addDays(new Date(), 21))
 })
 
-const showCatchUp = computed(() => calendar.state !== null && calendar.state.plan !== 'custom')
-const catchUpNotice = ref('')
-
-function catchUp() {
-    if (!confirm('Catch me up? Past days stay as they are. If you missed whole weeks, the plan picks up where you left off, '
-        + 'and everything from today on follows the latest plan. Workouts or runs you added yourself to upcoming days are replaced.')) return
-    const moved = calendar.catchUp()
-    catchUpNotice.value = moved > 0
-        ? `All caught up. The plan continues where you left off (${moved} missed ${moved === 1 ? 'week' : 'weeks'} skipped).`
-        : 'All caught up. Upcoming days follow the latest plan.'
-}
-
-function changePlan() {
-    if (!confirm('Change plan? This replaces your calendar, including entries you added or moved. Your workout history is kept.')) return
-    calendar.reset()
-    router.replace({ name: 'welcome' })
-}
 </script>
 
 <template>
     <div class="flex-1 flex flex-col">
-        <header class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 flex items-center justify-between gap-3">
-            <RouterLink to="/" class="header-btn">← Back</RouterLink>
+        <header class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+            <RouterLink to="/" class="header-btn justify-self-start">← Back</RouterLink>
             <button class="header-btn" @click="goToday">Today</button>
+            <RouterLink :to="{ name: 'planSettings' }" class="header-btn justify-self-end">Edit plan</RouterLink>
         </header>
 
         <main class="flex-1 px-safe pt-3 pb-safe flex flex-col gap-5">
@@ -177,15 +159,10 @@ function changePlan() {
                 </div>
             </section>
 
-            <!-- Plan -->
-            <section class="flex flex-col gap-2 border-t border-gray-800 pt-4">
-                <button v-if="showExtend" @click="calendar.extend()"
+            <!-- Plan running out -->
+            <section v-if="showExtend" class="flex flex-col gap-2 border-t border-gray-800 pt-4">
+                <button @click="calendar.extend()"
                     class="min-h-11 rounded-xl bg-indigo-600 text-white text-sm font-bold">Extend plan by 12 weeks</button>
-                <button v-if="showCatchUp" @click="catchUp"
-                    class="min-h-11 rounded-xl border border-indigo-700 text-indigo-300 text-sm font-semibold">Catch me up</button>
-                <p v-if="catchUpNotice" class="text-sm text-emerald-300 text-center">{{ catchUpNotice }}</p>
-                <button @click="changePlan"
-                    class="min-h-11 rounded-xl border border-gray-700 text-gray-300 text-sm font-semibold">Change plan</button>
             </section>
         </main>
     </div>

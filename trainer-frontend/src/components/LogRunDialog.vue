@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     /** Pre-filled minutes (the planned run time) */
     defaultMinutes: number
-}>()
+    /** What's being logged: "run", "walk" … */
+    activity?: string
+}>(), { activity: 'run' })
 
 const emit = defineEmits<{
     save: [minutes: number, distanceKm: number | null]
@@ -26,8 +28,8 @@ function save() {
     <div class="fixed inset-0 z-40 bg-black/60 flex items-end" @click.self="emit('cancel')">
         <div class="w-full bg-gray-800 rounded-t-3xl px-safe pt-5 pb-safe flex flex-col gap-4">
             <div>
-                <h2 class="text-lg font-bold text-white">Log your run</h2>
-                <p class="text-sm text-gray-400">How long did you run? (from your watch, or a guess)</p>
+                <h2 class="text-lg font-bold text-white">Log your {{ activity }}</h2>
+                <p class="text-sm text-gray-400">How long was it? (from your watch, or a guess)</p>
             </div>
 
             <div class="flex gap-2">
@@ -58,7 +60,7 @@ function save() {
                 </button>
                 <button @click="save"
                     class="flex-1 py-4 rounded-2xl bg-emerald-600 text-white font-bold text-lg active:scale-95 transition-transform">
-                    Save run
+                    Save {{ activity }}
                 </button>
             </div>
         </div>

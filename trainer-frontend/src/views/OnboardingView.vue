@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { PLANS, type PlanId } from '@/data/plans'
+import { PLANS, weekLayout, type PlanId } from '@/data/plans'
+import RunsToggle from '@/components/RunsToggle.vue'
 import type { WorkoutLocation } from '@/data'
 import BackupPanel from '@/components/BackupPanel.vue'
 import { useCalendarStore } from '@/stores/calendar'
@@ -14,16 +15,16 @@ const step = ref<1 | 2 | 3>(1)
 const plan = ref<PlanId | null>(null)
 const location = ref<WorkoutLocation | null>(null)
 const startDate = ref(toKey(nextMonday()))
+const includeRuns = ref(true)
 
 const locations: { value: WorkoutLocation, label: string, detail: string }[] = [
     { value: 'home', label: '🏠 Home', detail: 'No gear needed: floor, a chair, a sturdy table and a door.' },
     { value: 'gym', label: '🏋️ Gym', detail: 'Machines, barbells and dumbbells, with weight tracking.' },
 ]
 
-const week = [
-    { day: 'Mon', what: 'Strength' }, { day: 'Tue', what: 'Run' }, { day: 'Wed', what: 'Strength' },
-    { day: 'Thu', what: 'Run' }, { day: 'Fri', what: 'Strength' }, { day: 'Sat', what: 'Rest' }, { day: 'Sun', what: 'Long run' },
-]
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const week = computed(() =>
+    weekLayout(plan.value ?? 'build', includeRuns.value).map((what, i) => ({ day: DAYS[i]!, what })))
 
 const canContinue = computed(() =>
     step.value === 1 ? plan.value !== null : step.value === 2 ? location.value !== null : startDate.value >= todayKey())
@@ -39,7 +40,8 @@ function back() {
 }
 
 function finish() {
-    calendar.setup(plan.value ?? 'custom', location.value ?? 'home', plan.value === 'custom' ? todayKey() : startDate.value)
+    calendar.setup(plan.value ?? 'custom', location.value ?? 'home', plan.value === 'custom' ? todayKey() : startDate.value,
+        includeRuns.value)
     router.replace({ name: 'home' })
 }
 
@@ -73,16 +75,17 @@ function skip() {
             <template v-if="step === 1">
                 <div>
                     <h1 class="text-3xl font-bold text-white">Choose your plan</h1>
-                    <p class="text-gray-400 mt-1">It fills your calendar with workouts, runs and rest days. You can
+                    <p class="text-gray-400 mt-1">It fills your calendar with workouts and rest days. You can
                         change it any time.</p>
                 </div>
+                <RunsToggle v-model="includeRuns" />
                 <button v-for="p in PLANS" :key="p.id" @click="plan = p.id" :class="[
                     'text-left rounded-2xl p-4 border-2 flex flex-col gap-1 transition-colors',
                     plan === p.id ? 'border-indigo-500 bg-indigo-950/40' : 'border-gray-700 bg-gray-800'
                 ]">
                     <span class="text-xl font-bold text-white">{{ p.name }}</span>
                     <span class="text-sm font-semibold text-indigo-300">{{ p.tagline }}</span>
-                    <span class="text-sm text-gray-400">{{ p.description }}</span>
+                    <span class="text-sm text-gray-400">{{ includeRuns ? p.description : p.descriptionNoRuns ?? p.description }}</span>
                 </button>
                 <BackupPanel restore-only @restored="restored" />
             </template>
@@ -91,7 +94,7 @@ function skip() {
             <template v-else-if="step === 2">
                 <div>
                     <h1 class="text-3xl font-bold text-white">Where do you train?</h1>
-                    <p class="text-gray-400 mt-1">Runs are the same either way.</p>
+                    <p class="text-gray-400 mt-1">{{ includeRuns ? 'Runs are the same either way.' : 'Cardio is the same either way.' }}</p>
                 </div>
                 <button v-for="l in locations" :key="l.value" @click="location = l.value" :class="[
                     'text-left rounded-2xl p-4 border-2 flex flex-col gap-1 transition-colors',
@@ -110,7 +113,8 @@ function skip() {
                 </div>
                 <div class="grid grid-cols-7 gap-1.5">
                     <div v-for="d in week" :key="d.day" :class="['rounded-xl py-2 flex flex-col items-center gap-1',
-                        d.what === 'Strength' ? 'bg-indigo-500/15' : d.what === 'Rest' ? 'bg-gray-800' : 'bg-emerald-500/15']">
+                        d.what === 'Strength' ? 'bg-indigo-500/15' : d.what === 'Rest' ? 'bg-gray-800'
+                            : d.what === 'Cardio' ? 'bg-amber-500/15' : 'bg-emerald-500/15']">
                         <span class="text-xs font-bold text-white">{{ d.day }}</span>
                         <span class="text-[10px] text-gray-400 text-center leading-tight">{{ d.what }}</span>
                     </div>

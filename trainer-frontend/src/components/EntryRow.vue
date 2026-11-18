@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getWorkout, planExercises } from '@/data'
+import { capsSets, getWorkout, isCardio } from '@/data'
 import { jogLabel, jogMinutes, type CalendarEntry } from '@/data/plans'
 import { useCalendarStore } from '@/stores/calendar'
 import LogRunDialog from '@/components/LogRunDialog.vue'
@@ -29,8 +29,13 @@ const subtitle = computed(() => {
     const e = props.entry
     if (e.type === 'workout') {
         if (!workout.value) return ''
+        const logged = workout.value.format === 'log' && e.workoutId ? calendar.loggedSession(e.workoutId, e.date) : undefined
+        if (logged) {
+            const km = logged.distanceKm ? ` · ${logged.distanceKm} km` : ''
+            return `Walked ${Math.round(logged.durationSeconds / 60)} min${km}`
+        }
         const cap = calendar.setCapOn(e.date)
-        const eased = cap !== undefined && planExercises(workout.value).some(p => p.sets > cap)
+        const eased = capsSets(workout.value, cap)
         return `${workout.value.estimatedMinutes} min · ${workout.value.category}${eased ? ` · easy week: max ${cap} sets` : ''}`
     }
     if (e.type === 'jog' && e.jog) {
@@ -39,11 +44,11 @@ const subtitle = computed(() => {
     return 'Recover: sleep, eat well, maybe a walk'
 })
 
-const accent = computed(() => ({
+const accent = computed(() => isCardio(workout.value) ? 'bg-amber-500' : {
     workout: 'bg-indigo-500',
     jog: 'bg-emerald-500',
     rest: 'bg-gray-500',
-}[props.entry.type]))
+}[props.entry.type])
 
 function openWorkout() {
     // the planned date decides easy-week caps, even when previewing a future session
@@ -57,6 +62,18 @@ function startTimer() {
 function saveRun(minutes: number, distanceKm: number | null) {
     calendar.logRun(props.entry.id, minutes, distanceKm)
     logging.value = false
+}
+
+/** Done away from the phone (a walk): logged afterwards instead of started */
+const isLogged = computed(() => workout.value?.format === 'log')
+
+function saveSession(minutes: number, distanceKm: number | null) {
+    if (props.entry.workoutId) calendar.logSession(props.entry.workoutId, props.entry.date, minutes, distanceKm)
+    logging.value = false
+}
+
+function undoSession() {
+    if (props.entry.workoutId) calendar.undoSession(props.entry.workoutId, props.entry.date)
 }
 
 function undoRun() {
@@ -89,7 +106,13 @@ function move(date: string) {
         <!-- Actions -->
         <div v-if="entry.type !== 'rest' || editable" class="flex flex-wrap gap-2">
             <template v-if="entry.type === 'workout'">
-                <button @click="openWorkout"
+                <button v-if="isLogged && status !== 'done'" @click="logging = true"
+                    class="px-4 min-h-11 rounded-xl bg-amber-600 text-white text-sm font-bold active:scale-95 transition-transform">
+                    Log walk</button>
+                <button v-else-if="isLogged" @click="undoSession"
+                    class="px-4 min-h-11 rounded-xl border border-gray-600 text-gray-300 text-sm font-semibold active:scale-95 transition-transform">
+                    Undo</button>
+                <button v-else @click="openWorkout"
                     class="px-4 min-h-11 rounded-xl bg-indigo-600 text-white text-sm font-bold active:scale-95 transition-transform">
                     {{ status === 'done' ? 'View' : 'Start' }}</button>
             </template>
@@ -120,7 +143,9 @@ function move(date: string) {
             </template>
         </div>
 
-        <LogRunDialog v-if="logging" :default-minutes="entry.jog ? jogMinutes(entry.jog) : 30" @save="saveRun"
+        <LogRunDialog v-if="logging && isLogged" activity="walk" :default-minutes="workout?.estimatedMinutes ?? 30"
+            @save="saveSession" @cancel="logging = false" />
+        <LogRunDialog v-else-if="logging" :default-minutes="entry.jog ? jogMinutes(entry.jog) : 30" @save="saveRun"
             @cancel="logging = false" />
     </div>
 </template>

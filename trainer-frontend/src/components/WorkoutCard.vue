@@ -8,7 +8,7 @@ const props = defineProps<{
     category: string
     difficulty: number
     estimatedMinutes: number
-    format?: 'sets' | 'circuit' | 'rounds'
+    format?: 'sets' | 'circuit' | 'rounds' | 'log'
     location?: 'home' | 'gym'
     exercises: unknown[]
   }

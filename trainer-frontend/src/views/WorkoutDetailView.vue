@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import LogRunDialog from '@/components/LogRunDialog.vue'
 import { useRoute, useRouter } from 'vue-router'
-import { circuitLabel, getWorkout, planExercises, prescriptionLabel, stationLabel, type PlannedExercise } from '@/data'
+import { capsSets, circuitLabel, getWorkout, planExercises, prescriptionLabel, stationLabel, type PlannedExercise } from '@/data'
 import WatchLink from '@/components/WatchLink.vue'
 import { useCalendarStore } from '@/stores/calendar'
 import { todayKey } from '@/utils/date'
@@ -14,7 +15,7 @@ const workout = computed(() => getWorkout(route.params.id))
 /** Planned date from the calendar, else today */
 const sessionDate = computed(() => typeof route.query.date === 'string' ? route.query.date : todayKey())
 const setCap = computed(() => calendar.setCapOn(sessionDate.value))
-const eased = computed(() => setCap.value !== undefined && planExercises(workout.value).some(p => p.sets > setCap.value!))
+const eased = computed(() => capsSets(workout.value, setCap.value))
 const exercises = computed(() => planExercises(workout.value, setCap.value))
 const circuit = computed(() => workout.value?.format === 'circuit' ? workout.value.circuit : undefined)
 const rounds = computed(() => workout.value?.format === 'rounds' ? workout.value.rounds ?? 1 : undefined)
@@ -35,6 +36,18 @@ function supersetTag(index: number) {
     let position = 1
     for (let i = index - 1; i >= 0 && list[i]?.superset === label; i--) position++
     return `${label}${position}`
+}
+
+const logging = ref(false)
+/** Already logged on this day: show it with Undo instead of a second Log button */
+const logged = computed(() => workout.value?.format === 'log'
+    ? calendar.loggedSession(workout.value.id, sessionDate.value) : undefined)
+
+/** "log" workouts (a walk) are done away from the phone and logged afterwards */
+function saveSession(minutes: number, distanceKm: number | null) {
+    calendar.logSession(String(route.params.id), sessionDate.value, minutes, distanceKm)
+    logging.value = false
+    router.push('/')
 }
 
 function startWorkout() {
@@ -130,10 +143,25 @@ function startWorkout() {
 
         <!-- Start button -->
         <footer class="sticky bottom-0 z-20 bg-gray-900/95 backdrop-blur border-t border-gray-800 px-safe pt-3 pb-safe">
-            <button @click="startWorkout"
+            <div v-if="workout.format === 'log' && logged" class="flex items-center gap-3">
+                <span class="flex-1 text-emerald-300 font-semibold">
+                    ✓ Walked {{ Math.round(logged.durationSeconds / 60) }} min<template v-if="logged.distanceKm">
+                        · {{ logged.distanceKm }} km</template></span>
+                <button @click="calendar.undoSession(workout.id, sessionDate)"
+                    class="px-6 py-4 rounded-2xl border border-gray-600 text-gray-200 font-semibold active:scale-95 transition-transform">
+                    Undo</button>
+            </div>
+            <button v-else-if="workout.format === 'log'" @click="logging = true"
+                class="w-full py-4 rounded-2xl bg-amber-600 text-white font-bold text-lg active:scale-95 transition-transform">
+                Log walk
+            </button>
+            <button v-else @click="startWorkout"
                 class="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-lg active:scale-95 transition-transform">
                 Start Workout
             </button>
         </footer>
+
+        <LogRunDialog v-if="logging" activity="walk" :default-minutes="workout.estimatedMinutes" @save="saveSession"
+            @cancel="logging = false" />
     </div>
 </template>

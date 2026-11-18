@@ -30,6 +30,11 @@ const router = createRouter({
     component: () => import('@/views/CalendarView.vue'),
   },
   {
+    path: '/calendar/plan',
+    name: 'planSettings',
+    component: () => import('@/views/PlanSettingsView.vue'),
+  },
+  {
     path: '/run/:entryId',
     name: 'run',
     component: () => import('@/views/RunView.vue'),

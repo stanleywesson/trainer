@@ -6,7 +6,7 @@ import { useRoute, useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import ExerciseSetsTable from '@/components/ExerciseSetsTable.vue';
 import ExerciseSetsEditor from '@/components/ExerciseSetsEditor.vue';
-import { exercises } from '@/data';
+import { exercises, getWorkout } from '@/data';
 import { formatClock, formatDuration, formatPace } from '@/utils/format';
 
 const route = useRoute();
@@ -15,6 +15,9 @@ const historyStore = useHistoryStore();
 const calendar = useCalendarStore();
 const workout = computed(() => historyStore.getById(route.params.id as string));
 const isRun = computed(() => workout.value?.kind === 'run');
+/** A logged walk ("log"-format workout): shown like a run, with time and distance */
+const isWalk = computed(() => !isRun.value && getWorkout(workout.value?.workoutId)?.format === 'log');
+const isTimed = computed(() => isRun.value || isWalk.value);
 const confirming = ref(false);
 
 function deleteSession() {
@@ -110,7 +113,7 @@ function openExercise(exerciseId: string) {
         <!-- Header -->
         <header class="sticky top-0 z-20 bg-gray-900/95 backdrop-blur px-safe pt-safe pb-3 flex items-center gap-3">
             <button @click="router.back()" class="header-btn">← Back</button>
-            <h1 class="flex-1 text-xl font-bold text-white truncate">{{ isRun ? 'Run' : 'Workout' }} Detail</h1>
+            <h1 class="flex-1 text-xl font-bold text-white truncate">{{ isRun ? 'Run' : isWalk ? 'Walk' : 'Workout' }} Detail</h1>
             <button v-if="canEdit && !editing" @click="startEdit" class="header-btn shrink-0">Edit</button>
             <button v-if="workout && !editing" @click="confirming = true"
                 class="header-btn shrink-0 !text-red-300 !border-red-500/40">Delete</button>
@@ -127,7 +130,7 @@ function openExercise(exerciseId: string) {
         <div v-else class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
                 <h2 class="text-xl font-bold text-white">{{ workout.workoutName }}</h2>
-                <p class="text-gray-400 text-sm">{{ formatDate(workout.date) }}<template v-if="timeRange && !isRun">
+                <p class="text-gray-400 text-sm">{{ formatDate(workout.date) }}<template v-if="timeRange && !isTimed">
                     · {{ timeRange }}</template></p>
                 <p v-if="editing" class="text-xs text-gray-400">
                     Fix the numbers or remove a set. Can be changed until {{ editDeadline }}.</p>
@@ -142,8 +145,8 @@ function openExercise(exerciseId: string) {
                 <p v-if="showingOriginal && !editing" class="text-xs text-amber-300/90">Showing the sets as first saved.</p>
             </div>
 
-            <!-- Run -->
-            <template v-if="isRun">
+            <!-- Run or logged walk -->
+            <template v-if="isTimed">
                 <div class="grid grid-cols-2 gap-3">
                     <div class="stat-tile">
                         <span class="stat-label">Time</span>
@@ -227,9 +230,9 @@ function openExercise(exerciseId: string) {
         </div>
         </main>
 
-        <ConfirmDialog v-if="confirming" :title="`Delete this ${isRun ? 'run' : 'workout'}?`"
-            :message="isRun
-                ? 'It will be removed from history and the planned run will show as not done again.'
+        <ConfirmDialog v-if="confirming" :title="`Delete this ${isRun ? 'run' : isWalk ? 'walk' : 'workout'}?`"
+            :message="isTimed
+                ? `It will be removed from history and the planned ${isRun ? 'run' : 'walk'} will show as not done again.`
                 : 'It will be removed from history. This can\'t be undone.'"
             @confirm="deleteSession" @cancel="confirming = false" />
         <ConfirmDialog v-if="confirmingRevert" title="Undo edits?"

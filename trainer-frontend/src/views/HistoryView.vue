@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import BackupPanel from '@/components/BackupPanel.vue'
 import { useHistoryStore, type WorkoutSession } from '@/stores/history';
 import { formatDuration } from '@/utils/format';
+import { getWorkout, isCardio } from '@/data';
 
 const router = useRouter()
 const historyStore = useHistoryStore();
@@ -40,6 +41,16 @@ function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+/** Runs and logged walks: just time (and distance), no sets or rating */
+function isLoggedOnly(s: WorkoutSession) {
+    return s.kind === 'run' || getWorkout(s.workoutId)?.format === 'log'
+}
+
+function accent(s: WorkoutSession) {
+    if (s.kind === 'run') return 'bg-emerald-500'
+    return isCardio(getWorkout(s.workoutId)) ? 'bg-amber-500' : 'bg-indigo-500'
+}
+
 function openDetail(workout: WorkoutSession) {
     router.push({ name: 'historyDetail', params: { id: workout.id } })
 }
@@ -71,12 +82,11 @@ function openDetail(workout: WorkoutSession) {
             <div v-else class="flex flex-col gap-3">
                 <button v-for="entry in history" :key="entry.id" @click="openDetail(entry)"
                     class="bg-gray-800 rounded-2xl p-4 flex gap-3 text-left w-full active:scale-95 transition-transform">
-                    <span :class="['w-1.5 self-stretch rounded-full shrink-0',
-                        entry.kind === 'run' ? 'bg-emerald-500' : 'bg-indigo-500']"></span>
+                    <span :class="['w-1.5 self-stretch rounded-full shrink-0', accent(entry)]"></span>
                     <div class="flex-1 min-w-0 flex flex-col gap-2">
                         <div class="flex items-center justify-between gap-2">
                             <span class="font-semibold text-white truncate">{{ entry.workoutName }}</span>
-                            <span v-if="entry.kind !== 'run'"
+                            <span v-if="!isLoggedOnly(entry)"
                                 :class="['text-xs font-semibold shrink-0', difficultyColor[entry.difficulty]]">
                                 {{ difficultyLabel[entry.difficulty] }}
                             </span>
@@ -84,8 +94,8 @@ function openDetail(workout: WorkoutSession) {
                         <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-400">
                             <span>{{ formatDate(entry.date) }}</span>
                             <span>{{ formatDuration(entry.durationSeconds) }}</span>
-                            <span v-if="entry.kind === 'run' && entry.distanceKm">{{ entry.distanceKm }} km</span>
-                            <span v-if="entry.kind !== 'run'">{{ entry.completedExercises }} exercises</span>
+                            <span v-if="isLoggedOnly(entry) && entry.distanceKm">{{ entry.distanceKm }} km</span>
+                            <span v-if="!isLoggedOnly(entry)">{{ entry.completedExercises }} exercises</span>
                         </div>
                     </div>
                 </button>

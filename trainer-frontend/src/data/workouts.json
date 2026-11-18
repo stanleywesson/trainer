@@ -426,6 +426,25 @@
     ]
   },
   {
+    "id": "w11",
+    "name": "Brisk Walk",
+    "category": "Cardio",
+    "difficulty": 1,
+    "estimatedMinutes": 30,
+    "recommendation": "Easy cardio without running: 30 minutes at a brisk pace, outside or on a treadmill. Pick a hilly route to make it harder. Leave the phone in your pocket and log it when you're back.",
+    "format": "log",
+    "location": "home",
+    "exercises": [
+      {
+        "exerciseId": "c-brisk-walk",
+        "sets": 1,
+        "reps": 0,
+        "duration": 1800,
+        "restSeconds": 0
+      }
+    ]
+  },
+  {
     "id": "gym1",
     "name": "Back A",
     "category": "Back & Abs",
@@ -1215,6 +1234,371 @@
         "reps": 0,
         "duration": 30,
         "restSeconds": 30
+      }
+    ]
+  },
+  {
+    "id": "gym14",
+    "name": "Shoulders A",
+    "category": "Shoulders & Traps",
+    "difficulty": 4,
+    "estimatedMinutes": 50,
+    "recommendation": "Heavy shoulder day: the standing press first while fresh, then volume for the side and rear delts. Alternate with Shoulders B.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-ohp",
+        "warmupSets": 1,
+        "warmupReps": 15,
+        "sets": 4,
+        "reps": 6,
+        "repsMax": 8,
+        "restSeconds": 120
+      },
+      {
+        "exerciseId": "g-arnold-press",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-lateral-raise",
+        "sets": 4,
+        "reps": 12,
+        "repsMax": 15,
+        "restSeconds": 45
+      },
+      {
+        "exerciseId": "g-face-pull",
+        "sets": 3,
+        "reps": 15,
+        "restSeconds": 45
+      },
+      {
+        "exerciseId": "g-shrug",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "co19",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 45
+      }
+    ]
+  },
+  {
+    "id": "gym15",
+    "name": "Shoulders B",
+    "category": "Shoulders & Traps",
+    "difficulty": 3,
+    "estimatedMinutes": 45,
+    "recommendation": "Lighter shoulder day for the side and rear delts, with less pressing (Back B already presses this week). Short rests. Alternate with Shoulders A.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-machine-shoulder-press",
+        "warmupSets": 1,
+        "warmupReps": 15,
+        "sets": 3,
+        "reps": 10,
+        "repsMax": 12,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-cable-lateral-raise",
+        "sets": 4,
+        "reps": 15,
+        "restSeconds": 30
+      },
+      {
+        "exerciseId": "g-reverse-fly",
+        "sets": 3,
+        "reps": 15,
+        "superset": "A",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-face-pull",
+        "sets": 3,
+        "reps": 15,
+        "superset": "A",
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-lateral-raise",
+        "sets": 2,
+        "reps": 15,
+        "repsMax": 20,
+        "dropSet": {
+          "reps": 30,
+          "dropEvery": 10
+        },
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "co7",
+        "sets": 3,
+        "reps": 0,
+        "duration": 30,
+        "restSeconds": 30
+      }
+    ]
+  },
+  {
+    "id": "gym16",
+    "name": "Arms A",
+    "category": "Arms",
+    "difficulty": 3,
+    "estimatedMinutes": 50,
+    "recommendation": "Heavy arm day: barbell curls and close-grip bench first, then isolation for the long heads. Alternate with Arms B.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-barbell-curl",
+        "warmupSets": 1,
+        "warmupReps": 15,
+        "sets": 4,
+        "reps": 8,
+        "repsMax": 10,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-close-grip-bench",
+        "warmupSets": 1,
+        "warmupReps": 15,
+        "sets": 4,
+        "reps": 8,
+        "restSeconds": 90
+      },
+      {
+        "exerciseId": "g-incline-db-curl",
+        "sets": 3,
+        "reps": 10,
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-overhead-triceps",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-hammer-curl",
+        "sets": 3,
+        "reps": 12,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-triceps-pushdown",
+        "sets": 3,
+        "reps": 12,
+        "repsMax": 15,
+        "restSeconds": 60
+      }
+    ]
+  },
+  {
+    "id": "gym17",
+    "name": "Arms B",
+    "category": "Arms",
+    "difficulty": 3,
+    "estimatedMinutes": 45,
+    "recommendation": "Pump day: biceps and triceps in supersets, rest only after each pair. Dips to failure to finish. Alternate with Arms A.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-preacher-curl",
+        "sets": 3,
+        "reps": 12,
+        "superset": "A",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-skull-crusher",
+        "sets": 3,
+        "reps": 10,
+        "repsMax": 12,
+        "superset": "A",
+        "restSeconds": 75
+      },
+      {
+        "exerciseId": "g-cable-curl",
+        "sets": 3,
+        "reps": 12,
+        "repsMax": 15,
+        "superset": "B",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-triceps-pushdown",
+        "sets": 3,
+        "reps": 12,
+        "repsMax": 15,
+        "superset": "B",
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-hammer-curl",
+        "sets": 3,
+        "reps": 12,
+        "superset": "C",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-overhead-triceps",
+        "sets": 3,
+        "reps": 12,
+        "superset": "C",
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "vp6",
+        "sets": 2,
+        "reps": 0,
+        "max": true,
+        "restSeconds": 60
+      }
+    ]
+  },
+  {
+    "id": "gym20",
+    "name": "Arm Pump",
+    "category": "Arms",
+    "difficulty": 2,
+    "estimatedMinutes": 15,
+    "recommendation": "Short add-on for the easy week: two arm supersets after your main workout. Light weights, chase the pump, rest only after each pair.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-cable-curl",
+        "sets": 2,
+        "reps": 12,
+        "repsMax": 15,
+        "superset": "A",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-triceps-pushdown",
+        "sets": 2,
+        "reps": 12,
+        "repsMax": 15,
+        "superset": "A",
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-hammer-curl",
+        "sets": 2,
+        "reps": 12,
+        "superset": "B",
+        "restSeconds": 0
+      },
+      {
+        "exerciseId": "g-overhead-triceps",
+        "sets": 2,
+        "reps": 12,
+        "superset": "B",
+        "restSeconds": 60
+      }
+    ]
+  },
+  {
+    "id": "gym18",
+    "name": "Steady Cardio",
+    "category": "Cardio",
+    "difficulty": 2,
+    "estimatedMinutes": 35,
+    "recommendation": "Easy aerobic work for the heart and recovery: three machines, 10 minutes each, at a pace where you can still talk. No running.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-incline-walk",
+        "sets": 1,
+        "reps": 0,
+        "duration": 600,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-bike",
+        "sets": 1,
+        "reps": 0,
+        "duration": 600,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-rower",
+        "sets": 1,
+        "reps": 0,
+        "duration": 600,
+        "restSeconds": 0
+      }
+    ]
+  },
+  {
+    "id": "gym19",
+    "name": "Cardio Intervals",
+    "category": "Cardio",
+    "difficulty": 3,
+    "estimatedMinutes": 30,
+    "recommendation": "Short and hard: 8 × 1 minute fast on the rower with 1 minute easy in between, after a bike warm-up. No running.",
+    "format": "sets",
+    "location": "gym",
+    "exercises": [
+      {
+        "exerciseId": "g-bike",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 30
+      },
+      {
+        "exerciseId": "g-row",
+        "sets": 8,
+        "reps": 0,
+        "duration": 60,
+        "restSeconds": 60
+      },
+      {
+        "exerciseId": "g-incline-walk",
+        "sets": 1,
+        "reps": 0,
+        "duration": 300,
+        "restSeconds": 0
       }
     ]
   },

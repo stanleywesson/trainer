@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { WorkoutLocation } from '@/data'
+import { getWorkout, type WorkoutLocation } from '@/data'
 import {
   generatePlan, jogLabel, planWeekAt, planWeekOf, setCapOn as planSetCapOn, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId,
 } from '@/data/plans'
@@ -16,6 +16,8 @@ export interface CalendarState {
   entries: CalendarEntry[]
   /** Calendar weeks (0-based from startDate) that "Catch me up" skipped because nothing was trained */
   skippedWeeks?: number[]
+  /** Plan includes runs; missing (calendars from before the option) means true */
+  includeRuns?: boolean
 }
 
 const STORAGE_KEY = 'trainer_calendar'
@@ -48,13 +50,16 @@ export const useCalendarStore = defineStore('calendar', () => {
   const needsSetup = computed(() => state.value === null)
   const entries = computed(() => state.value?.entries ?? [])
 
-  function setup(plan: PlanId, location: WorkoutLocation, startDate: string) {
+  const includeRuns = computed(() => state.value?.includeRuns !== false)
+
+  function setup(plan: PlanId, location: WorkoutLocation, startDate: string, runs = true) {
     state.value = {
       plan,
       location,
       startDate,
       weeksGenerated: plan === 'custom' ? 0 : WEEKS_PER_BLOCK,
-      entries: generatePlan(plan, location, startDate, 0, WEEKS_PER_BLOCK),
+      entries: generatePlan(plan, location, startDate, 0, WEEKS_PER_BLOCK, 0, runs),
+      includeRuns: runs,
     }
     persist()
   }
@@ -70,7 +75,7 @@ export const useCalendarStore = defineStore('calendar', () => {
     if (!s || s.plan === 'custom') return
     const from = s.weeksGenerated
     const offset = s.skippedWeeks?.length ?? 0
-    s.entries.push(...generatePlan(s.plan, s.location, s.startDate, from, from + WEEKS_PER_BLOCK, offset))
+    s.entries.push(...generatePlan(s.plan, s.location, s.startDate, from, from + WEEKS_PER_BLOCK, offset, includeRuns.value))
     s.weeksGenerated = from + WEEKS_PER_BLOCK
     persist()
   }
@@ -85,9 +90,7 @@ export const useCalendarStore = defineStore('calendar', () => {
     const s = state.value
     if (!s || s.plan === 'custom') return 0
     const today = todayKey()
-    const cutoff = entriesOn(today).some(isDone) || activeDays.value.has(today)
-      ? toKey(addDays(fromKey(today), 1))
-      : today
+    const cutoff = rebuildCutoff()
 
     // finished calendar weeks (before this one) without a single workout or run
     const thisWeek = planWeekOf(s.startDate, today)
@@ -106,12 +109,47 @@ export const useCalendarStore = defineStore('calendar', () => {
     const toWeek = Math.max(fromWeek + 4, s.weeksGenerated + oldOffset - offset)
 
     s.entries = s.entries.filter(e => e.date < cutoff || isDone(e))
-    s.entries.push(...generatePlan(s.plan, s.location, s.startDate, fromWeek, toWeek, offset)
+    s.entries.push(...generatePlan(s.plan, s.location, s.startDate, fromWeek, toWeek, offset, includeRuns.value)
       .filter(e => e.date >= cutoff))
     s.skippedWeeks = skipped
     s.weeksGenerated = toWeek
     persist()
     return offset - oldOffset
+  }
+
+  /** First day a rebuild may replace: today, or tomorrow once something was trained today */
+  function rebuildCutoff(): string {
+    const today = todayKey()
+    return entriesOn(today).some(isDone) || activeDays.value.has(today)
+      ? toKey(addDays(fromKey(today), 1))
+      : today
+  }
+
+  /**
+   * Change runs or location mid-plan. You stay in the same plan week: past days stay as they are and
+   * everything from today on is rebuilt (entries added by hand to upcoming days are replaced).
+   */
+  function changeSettings(patch: { includeRuns?: boolean, location?: WorkoutLocation }) {
+    const s = state.value
+    if (!s || s.plan === 'custom') return
+    Object.assign(s, patch)
+    const cutoff = rebuildCutoff()
+    const offset = s.skippedWeeks?.length ?? 0
+    const fromWeek = Math.max(0, planWeekAt(s.startDate, cutoff, s.skippedWeeks))
+    const toWeek = Math.max(fromWeek + 4, s.weeksGenerated)
+    s.entries = s.entries.filter(e => e.date < cutoff || isDone(e))
+    s.entries.push(...generatePlan(s.plan, s.location, s.startDate, fromWeek, toWeek, offset, includeRuns.value)
+      .filter(e => e.date >= cutoff))
+    s.weeksGenerated = toWeek
+    persist()
+  }
+
+  function setIncludeRuns(on: boolean) {
+    if (includeRuns.value !== on) changeSettings({ includeRuns: on })
+  }
+
+  function setLocation(location: WorkoutLocation) {
+    if (state.value && state.value.location !== location) changeSettings({ location })
   }
 
   /** Last planned day, used to offer "Extend plan" near the end */
@@ -134,7 +172,7 @@ export const useCalendarStore = defineStore('calendar', () => {
   /** Max working sets per exercise for a strength session on this date (easy weeks), else undefined */
   function setCapOn(date: string): number | undefined {
     const s = state.value
-    return s ? planSetCapOn(s.plan, s.startDate, date, s.skippedWeeks) : undefined
+    return s ? planSetCapOn(s.plan, s.startDate, date, s.skippedWeeks, includeRuns.value) : undefined
   }
 
   function removeEntry(id: string) {
@@ -146,13 +184,42 @@ export const useCalendarStore = defineStore('calendar', () => {
     persist()
   }
 
-  /** Runs are dated on their calendar day (now if that's today, else midday) so history and streaks agree */
-  function addRunToHistory(entryId: string, minutes: number, distanceKm?: number | null) {
-    const entry = state.value?.entries.find(e => e.id === entryId)
-    const day = entry?.date
-    const date = !day || day === todayKey()
+  /** Logged sessions are dated on their calendar day (now if that's today, else midday) so history and streaks agree */
+  function sessionDateFor(day: string | undefined): string {
+    return !day || day === todayKey()
       ? new Date().toISOString()
       : new Date(fromKey(day).getTime() + 12 * 3600_000).toISOString()
+  }
+
+  /** Log a "log"-format workout (e.g. a brisk walk) done on a calendar day; it then shows as done there */
+  function logSession(workoutId: string, day: string, minutes: number, distanceKm?: number | null) {
+    const workout = getWorkout(workoutId)
+    if (!workout) return
+    history.saveWorkout({
+      kind: 'workout',
+      workoutId,
+      workoutName: workout.name,
+      durationSeconds: minutes * 60,
+      difficulty: 0,
+      completedExercises: workout.exercises.length,
+      ...(distanceKm ? { distanceKm } : {}),
+    }, sessionDateFor(day))
+  }
+
+  /** The session logged for a "log"-format workout on a calendar day, if any */
+  function loggedSession(workoutId: string, day: string) {
+    return history.workouts.find(w => w.workoutId === workoutId && toKey(new Date(w.date)) === day)
+  }
+
+  /** Un-log a "log"-format workout: removes its history record, so the calendar day is open again */
+  function undoSession(workoutId: string, day: string) {
+    const session = loggedSession(workoutId, day)
+    if (session) history.removeWorkout(session.id)
+  }
+
+  function addRunToHistory(entryId: string, minutes: number, distanceKm?: number | null) {
+    const entry = state.value?.entries.find(e => e.id === entryId)
+    const date = sessionDateFor(entry?.date)
     history.saveWorkout({
       kind: 'run',
       calendarEntryId: entryId,
@@ -290,8 +357,8 @@ export const useCalendarStore = defineStore('calendar', () => {
   backfillRuns()
 
   return {
-    state, needsSetup, entries, lastDate, streak,
-    setup, reset, extend, catchUp, addEntry, updateEntry, removeEntry, entriesOn, isDone, status, setCapOn,
-    logRun, undoRun, deleteSession, importMode, importCalendar,
+    state, needsSetup, entries, lastDate, streak, includeRuns,
+    setup, reset, extend, catchUp, setIncludeRuns, setLocation, addEntry, updateEntry, removeEntry, entriesOn, isDone, status, setCapOn,
+    logRun, undoRun, logSession, loggedSession, undoSession, deleteSession, importMode, importCalendar,
   }
 })

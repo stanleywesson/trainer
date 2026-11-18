@@ -84,8 +84,9 @@ export interface Workout {
    * "sets": do all sets of one exercise, then move on.
    * "circuit": timed intervals through every exercise, repeated for N rounds.
    * "rounds": complete each station's target (reps / distance) and move straight on, repeated for N rounds; a stopwatch tracks the time.
+   * "log": done away from the phone (a long walk); you log the minutes afterwards, like a run.
    */
-  format: 'sets' | 'circuit' | 'rounds'
+  format: 'sets' | 'circuit' | 'rounds' | 'log'
   location?: WorkoutLocation
   circuit?: CircuitConfig
   /** Number of rounds, for format "rounds" */
@@ -125,7 +126,23 @@ export interface PlannedExercise extends Exercise {
 }
 
 /** `maxSets` caps the working sets of every exercise (easy weeks) */
-export function planExercises(workout: Workout | undefined, maxSets?: number): PlannedExercise[] {
+/** Cardio and conditioning sessions (no strength focus): own calendar colour, no easy-week set cap */
+export function isCardio(workout: Workout | undefined): boolean {
+  return workout?.category === 'Cardio' || workout?.category === 'Conditioning'
+}
+
+/** Easy-week set caps apply to strength work only: capping cardio would cut intervals short */
+function capApplies(workout: Workout | undefined): boolean {
+  return !isCardio(workout)
+}
+
+/** The easy-week cap actually lowers some exercise's sets in this workout */
+export function capsSets(workout: Workout | undefined, maxSets: number | undefined): boolean {
+  return maxSets !== undefined && capApplies(workout) && planExercises(workout).some(p => p.sets > maxSets)
+}
+
+export function planExercises(workout: Workout | undefined, cap?: number): PlannedExercise[] {
+  const maxSets = capApplies(workout) ? cap : undefined
   return (workout?.exercises ?? []).map(entry => {
     const ex = getExercise(entry.exerciseId)
     const reps = entry.reps ?? ex.defaultReps

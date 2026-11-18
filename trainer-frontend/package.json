@@ -1,6 +1,6 @@
 {
   "name": "trainer",
-  "version": "1.4.12",
+  "version": "1.5.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
+    "test": "vitest run",
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
@@ -39,6 +40,7 @@
     "vite": "^7.3.1",
     "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-vue-devtools": "^8.0.6",
+    "vitest": "^3.2.7",
     "vue-tsc": "^3.2.5"
   },
   "engines": {
