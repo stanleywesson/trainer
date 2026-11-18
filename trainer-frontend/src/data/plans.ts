@@ -21,7 +21,7 @@ export const PLANS: PlanInfo[] = [
     id: 'build',
     name: 'Build',
     tagline: 'Already training consistently',
-    description: 'Push / pull / legs (or the full gym rotation), easy runs and a weekly long run.',
+    description: 'Chest / legs / back in the gym (or push / pull / legs at home), two easy runs and a weekly long run, with an easier week every 4th week.',
   },
   {
     id: 'custom',
@@ -73,9 +73,30 @@ function rebuildJog(week: number, long: boolean): JogSpec {
   return continuous(long ? 25 : 20)
 }
 
-/** Build: 25 min easy runs, long run grows from 35 to 45 min */
-function buildJog(week: number, long: boolean): JogSpec {
-  return continuous(long ? Math.min(45, 35 + week * 2) : 25)
+const REBUILD_WEEKS = 8
+export const WEEKS_PER_BLOCK = 12
+
+/** Coming from Rebuild, the gym plan spends its first Build weeks on the Base workouts before the A/B rotation */
+const BASE_WEEKS = 4
+/** Every 4th Build week is an easier week: shorter runs and fewer working sets */
+const EASY_WEEK_EVERY = 4
+const EASY_WEEK_MAX_SETS = 2
+const LONG_RUN_MAX = 60
+
+function isEasyWeek(buildWeek: number): boolean {
+  return buildWeek >= 0 && (buildWeek + 1) % EASY_WEEK_EVERY === 0
+}
+
+/**
+ * Build: 30 min easy runs (25 min while still on the Base workouts after Rebuild).
+ * The long run grows 2 min a week up to an hour; easy weeks cut every run back.
+ */
+function buildJog(week: number, long: boolean, fromRebuild: boolean): JogSpec {
+  const easyWeek = isEasyWeek(week)
+  if (!long) return continuous(easyWeek ? 20 : fromRebuild && week < BASE_WEEKS ? 25 : 30)
+  const start = fromRebuild ? 28 : 35
+  const minutes = Math.min(LONG_RUN_MAX, start + week * 2)
+  return continuous(easyWeek ? Math.max(start, minutes - 10) : minutes)
 }
 
 /** Strength workouts for Mon / Wed / Fri (each day may have more than one) */
@@ -85,24 +106,25 @@ function rebuildStrength(week: number, location: WorkoutLocation): string[][] {
     return [['w2'], ['w3'], ['w4']]
   }
   if (week < 4) return week % 2 === 0 ? [['gym6'], ['gym7'], ['gym6']] : [['gym7'], ['gym6'], ['gym7']]
-  return week % 2 === 0 ? [['gym8'], ['gym9'], ['gym8']] : [['gym9'], ['gym8'], ['gym9']]
+  // lower body midweek only, so it never lands just before the Sunday long run
+  return [['gym8'], ['gym9'], ['gym8']]
 }
 
-function buildStrength(week: number, location: WorkoutLocation): string[][] {
+/** Mon chest · Wed legs (furthest from the Sunday long run) · Fri back */
+function buildStrength(week: number, location: WorkoutLocation, fromRebuild: boolean): string[][] {
   if (location === 'home') {
     // every other week, swap pull day for a circuit: arms (W6) or conditioning (W9)
     const wed = week % 4 === 1 ? 'w6' : week % 4 === 3 ? 'w9' : 'w3'
     return [['w2'], [wed], ['w4']]
   }
-  return week % 2 === 0 ? [['gym2'], ['gym1'], ['gym4']] : [['gym3'], ['gym2'], ['gym5']]
+  if (fromRebuild && week < BASE_WEEKS) return [['gym11'], ['gym13'], ['gym12']]
+  // A = heavy (Chest A, Legs A, Back A), B = lighter and higher-rep (Chest B, Legs B, Back B).
+  // An easy week repeats the previous rotation week, so easy weeks alternate between A and B.
+  const easyWeeks = (w: number) => Math.floor((w + 1) / EASY_WEEK_EVERY)
+  const firstHardWeek = fromRebuild ? BASE_WEEKS : 0
+  const rotation = week - firstHardWeek - (easyWeeks(week) - easyWeeks(firstHardWeek - 1))
+  return rotation % 2 === 0 ? [['gym2'], ['gym4'], ['gym1']] : [['gym10'], ['gym5'], ['gym3']]
 }
-
-const REBUILD_WEEKS = 8
-export const WEEKS_PER_BLOCK = 12
-
-/** Rebuild hands over to Build gently: for the first Build weeks every exercise is capped at a few working sets */
-const BUILD_INTRO_WEEKS = 2
-const BUILD_INTRO_MAX_SETS = 3
 
 /** Plan week (0-based) a "YYYY-MM-DD" date falls in; week 0 contains startDate */
 export function planWeekOf(startDate: string, date: string): number {
@@ -112,11 +134,21 @@ export function planWeekOf(startDate: string, date: string): number {
   return Math.round((monday.getTime() - first.getTime()) / (7 * 86_400_000))
 }
 
-/** Working-set cap for strength sessions on a date (the Rebuild → Build ease-in weeks), else undefined */
-export function setCapOn(plan: PlanId, startDate: string, date: string): number | undefined {
-  if (plan !== 'rebuild') return undefined
-  const buildWeek = planWeekOf(startDate, date) - REBUILD_WEEKS
-  return buildWeek >= 0 && buildWeek < BUILD_INTRO_WEEKS ? BUILD_INTRO_MAX_SETS : undefined
+/**
+ * Plan week for a date once "Catch me up" has skipped some calendar weeks:
+ * every skipped week before the date pushes the plan back one week.
+ */
+export function planWeekAt(startDate: string, date: string, skippedWeeks: number[] = []): number {
+  const calendarWeek = planWeekOf(startDate, date)
+  return calendarWeek - skippedWeeks.filter(w => w < calendarWeek).length
+}
+
+/** Working-set cap for strength sessions on a date (the Build easy weeks), else undefined */
+export function setCapOn(plan: PlanId, startDate: string, date: string, skippedWeeks: number[] = []): number | undefined {
+  if (plan === 'custom') return undefined
+  const week = planWeekAt(startDate, date, skippedWeeks)
+  const buildWeek = plan === 'rebuild' ? week - REBUILD_WEEKS : week
+  return isEasyWeek(buildWeek) ? EASY_WEEK_MAX_SETS : undefined
 }
 
 /**
@@ -130,6 +162,8 @@ export function generatePlan(
   startDate: string,
   fromWeek: number,
   toWeek: number,
+  /** Calendar weeks the plan runs behind after "Catch me up" skipped missed weeks */
+  weekOffset = 0,
 ): CalendarEntry[] {
   if (plan === 'custom') return []
   const entries: CalendarEntry[] = []
@@ -138,10 +172,11 @@ export function generatePlan(
   for (let week = fromWeek; week < toWeek; week++) {
     const inRebuild = plan === 'rebuild' && week < REBUILD_WEEKS
     const buildWeek = plan === 'rebuild' ? week - REBUILD_WEEKS : week
-    const strength = inRebuild ? rebuildStrength(week, location) : buildStrength(buildWeek, location)
-    const jog = (long: boolean) => (inRebuild ? rebuildJog(week, long) : buildJog(buildWeek, long))
+    const fromRebuild = plan === 'rebuild'
+    const strength = inRebuild ? rebuildStrength(week, location) : buildStrength(buildWeek, location, fromRebuild)
+    const jog = (long: boolean) => (inRebuild ? rebuildJog(week, long) : buildJog(buildWeek, long, fromRebuild))
 
-    const monday = addDays(firstMonday, week * 7)
+    const monday = addDays(firstMonday, (week + weekOffset) * 7)
     const day = (offset: number) => toKey(addDays(monday, offset))
     const add = (offset: number, e: Omit<CalendarEntry, 'id' | 'date'>) => {
       const date = day(offset)

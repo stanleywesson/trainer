@@ -1569,6 +1569,21 @@
     "weighted": true
   },
   {
+    "id": "g-hammer-curl",
+    "name": "Hammer Curl",
+    "muscleGroup": "Biceps, Forearms",
+    "secondaryMuscle": "Brachialis, Grip",
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "repType": "reps",
+    "restSeconds": 60,
+    "tempo": "2-0-1-1",
+    "equipment": "Dumbbells",
+    "description": "Dumbbells at your sides, palms facing each other. Curl up with the elbows pinned to your sides, no swinging, and lower slowly.",
+    "progressionPath": "Heavier → Pause at the top",
+    "weighted": true
+  },
+  {
     "id": "hx-run",
     "name": "Run",
     "muscleGroup": "Cardio",

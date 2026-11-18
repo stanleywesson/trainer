@@ -124,7 +124,7 @@ export interface PlannedExercise extends Exercise {
   dropSet?: DropSet
 }
 
-/** `maxSets` caps the working sets of every exercise (ease-in weeks) */
+/** `maxSets` caps the working sets of every exercise (easy weeks) */
 export function planExercises(workout: Workout | undefined, maxSets?: number): PlannedExercise[] {
   return (workout?.exercises ?? []).map(entry => {
     const ex = getExercise(entry.exerciseId)

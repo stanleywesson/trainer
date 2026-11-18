@@ -78,6 +78,18 @@ const showExtend = computed(() => {
     return calendar.state?.plan !== 'custom' && !!last && last <= toKey(addDays(new Date(), 21))
 })
 
+const showCatchUp = computed(() => calendar.state !== null && calendar.state.plan !== 'custom')
+const catchUpNotice = ref('')
+
+function catchUp() {
+    if (!confirm('Catch me up? Past days stay as they are. If you missed whole weeks, the plan picks up where you left off, '
+        + 'and everything from today on follows the latest plan. Workouts or runs you added yourself to upcoming days are replaced.')) return
+    const moved = calendar.catchUp()
+    catchUpNotice.value = moved > 0
+        ? `All caught up. The plan continues where you left off (${moved} missed ${moved === 1 ? 'week' : 'weeks'} skipped).`
+        : 'All caught up. Upcoming days follow the latest plan.'
+}
+
 function changePlan() {
     if (!confirm('Change plan? This replaces your calendar, including entries you added or moved. Your workout history is kept.')) return
     calendar.reset()
@@ -169,6 +181,9 @@ function changePlan() {
             <section class="flex flex-col gap-2 border-t border-gray-800 pt-4">
                 <button v-if="showExtend" @click="calendar.extend()"
                     class="min-h-11 rounded-xl bg-indigo-600 text-white text-sm font-bold">Extend plan by 12 weeks</button>
+                <button v-if="showCatchUp" @click="catchUp"
+                    class="min-h-11 rounded-xl border border-indigo-700 text-indigo-300 text-sm font-semibold">Catch me up</button>
+                <p v-if="catchUpNotice" class="text-sm text-emerald-300 text-center">{{ catchUpNotice }}</p>
                 <button @click="changePlan"
                     class="min-h-11 rounded-xl border border-gray-700 text-gray-300 text-sm font-semibold">Change plan</button>
             </section>

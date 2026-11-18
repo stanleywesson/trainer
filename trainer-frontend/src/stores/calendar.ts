@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { WorkoutLocation } from '@/data'
-import { generatePlan, jogLabel, setCapOn as planSetCapOn, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId } from '@/data/plans'
+import {
+  generatePlan, jogLabel, planWeekAt, planWeekOf, setCapOn as planSetCapOn, WEEKS_PER_BLOCK, type CalendarEntry, type PlanId,
+} from '@/data/plans'
 import { RUN_WORKOUT_ID, useHistoryStore } from '@/stores/history'
 import { keepUnreadable } from '@/utils/backup'
-import { fromKey, toKey, todayKey } from '@/utils/date'
+import { addDays, fromKey, mondayOf, toKey, todayKey } from '@/utils/date'
 
 export interface CalendarState {
   plan: PlanId
@@ -12,6 +14,8 @@ export interface CalendarState {
   startDate: string
   weeksGenerated: number
   entries: CalendarEntry[]
+  /** Calendar weeks (0-based from startDate) that "Catch me up" skipped because nothing was trained */
+  skippedWeeks?: number[]
 }
 
 const STORAGE_KEY = 'trainer_calendar'
@@ -65,9 +69,49 @@ export const useCalendarStore = defineStore('calendar', () => {
     const s = state.value
     if (!s || s.plan === 'custom') return
     const from = s.weeksGenerated
-    s.entries.push(...generatePlan(s.plan, s.location, s.startDate, from, from + WEEKS_PER_BLOCK))
+    const offset = s.skippedWeeks?.length ?? 0
+    s.entries.push(...generatePlan(s.plan, s.location, s.startDate, from, from + WEEKS_PER_BLOCK, offset))
     s.weeksGenerated = from + WEEKS_PER_BLOCK
     persist()
+  }
+
+  /**
+   * "Catch me up": past days stay as they are (done or missed). Whole calendar weeks with no training
+   * are skipped so the plan picks up where you left off, and everything from today on is rebuilt
+   * from the current plan. Entries added by hand to upcoming days are replaced.
+   * Returns how many weeks the plan moved back.
+   */
+  function catchUp(): number {
+    const s = state.value
+    if (!s || s.plan === 'custom') return 0
+    const today = todayKey()
+    const cutoff = entriesOn(today).some(isDone) || activeDays.value.has(today)
+      ? toKey(addDays(fromKey(today), 1))
+      : today
+
+    // finished calendar weeks (before this one) without a single workout or run
+    const thisWeek = planWeekOf(s.startDate, today)
+    const firstMonday = mondayOf(fromKey(s.startDate))
+    const skipped: number[] = []
+    for (let week = 0; week < thisWeek; week++) {
+      const monday = addDays(firstMonday, week * 7)
+      const trained = [0, 1, 2, 3, 4, 5, 6].some(d => activeDays.value.has(toKey(addDays(monday, d))))
+      if (!trained) skipped.push(week)
+    }
+    const oldOffset = s.skippedWeeks?.length ?? 0
+    const offset = skipped.length
+
+    const fromWeek = Math.max(0, planWeekAt(s.startDate, cutoff, skipped))
+    // keep the calendar filled as far ahead as before
+    const toWeek = Math.max(fromWeek + 4, s.weeksGenerated + oldOffset - offset)
+
+    s.entries = s.entries.filter(e => e.date < cutoff || isDone(e))
+    s.entries.push(...generatePlan(s.plan, s.location, s.startDate, fromWeek, toWeek, offset)
+      .filter(e => e.date >= cutoff))
+    s.skippedWeeks = skipped
+    s.weeksGenerated = toWeek
+    persist()
+    return offset - oldOffset
   }
 
   /** Last planned day, used to offer "Extend plan" near the end */
@@ -87,10 +131,10 @@ export const useCalendarStore = defineStore('calendar', () => {
     persist()
   }
 
-  /** Max working sets per exercise for a strength session on this date (ease-in weeks), else undefined */
+  /** Max working sets per exercise for a strength session on this date (easy weeks), else undefined */
   function setCapOn(date: string): number | undefined {
     const s = state.value
-    return s ? planSetCapOn(s.plan, s.startDate, date) : undefined
+    return s ? planSetCapOn(s.plan, s.startDate, date, s.skippedWeeks) : undefined
   }
 
   function removeEntry(id: string) {
@@ -172,6 +216,9 @@ export const useCalendarStore = defineStore('calendar', () => {
         }
       }
       current.weeksGenerated = Math.max(current.weeksGenerated, incoming.weeksGenerated)
+      if (incoming.skippedWeeks?.length && (incoming.skippedWeeks.length > (current.skippedWeeks?.length ?? 0))) {
+        current.skippedWeeks = incoming.skippedWeeks
+      }
     } else {
       state.value = incoming
     }
@@ -244,7 +291,7 @@ export const useCalendarStore = defineStore('calendar', () => {
 
   return {
     state, needsSetup, entries, lastDate, streak,
-    setup, reset, extend, addEntry, updateEntry, removeEntry, entriesOn, isDone, status, setCapOn,
+    setup, reset, extend, catchUp, addEntry, updateEntry, removeEntry, entriesOn, isDone, status, setCapOn,
     logRun, undoRun, deleteSession, importMode, importCalendar,
   }
 })

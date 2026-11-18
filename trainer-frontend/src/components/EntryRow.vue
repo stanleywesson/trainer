@@ -31,7 +31,7 @@ const subtitle = computed(() => {
         if (!workout.value) return ''
         const cap = calendar.setCapOn(e.date)
         const eased = cap !== undefined && planExercises(workout.value).some(p => p.sets > cap)
-        return `${workout.value.estimatedMinutes} min · ${workout.value.category}${eased ? ` · ease-in: max ${cap} sets` : ''}`
+        return `${workout.value.estimatedMinutes} min · ${workout.value.category}${eased ? ` · easy week: max ${cap} sets` : ''}`
     }
     if (e.type === 'jog' && e.jog) {
         return e.done && e.doneMinutes ? `Ran ${e.doneMinutes} min · planned: ${jogLabel(e.jog)}` : jogLabel(e.jog)
@@ -46,7 +46,7 @@ const accent = computed(() => ({
 }[props.entry.type]))
 
 function openWorkout() {
-    // the planned date decides ease-in caps, even when previewing a future session
+    // the planned date decides easy-week caps, even when previewing a future session
     if (props.entry.workoutId) router.push({ name: 'workoutDetail', params: { id: props.entry.workoutId }, query: { date: props.entry.date } })
 }
 

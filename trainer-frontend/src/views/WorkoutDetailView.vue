@@ -98,11 +98,11 @@ function startWorkout() {
             <p class="text-sm text-gray-300 leading-relaxed">{{ workout.recommendation }}</p>
         </div>
 
-        <!-- Ease-in weeks -->
+        <!-- Easy weeks -->
         <div v-if="eased" class="bg-emerald-950/50 border border-emerald-800/40 rounded-2xl p-4 flex flex-col gap-1">
-            <span class="text-xs font-semibold uppercase tracking-widest text-emerald-400">Ease-in week</span>
-            <p class="text-sm text-gray-300 leading-relaxed">Max {{ setCap }} working sets per exercise while you settle
-                into the new program. For lifts you haven't done before, start light and find your working weight.</p>
+            <span class="text-xs font-semibold uppercase tracking-widest text-emerald-400">Easy week</span>
+            <p class="text-sm text-gray-300 leading-relaxed">Max {{ setCap }} working sets per exercise this week. Keep
+                your usual weights: the lighter week lets your body recover so you come back stronger.</p>
         </div>
 
         <!-- Exercise list -->
